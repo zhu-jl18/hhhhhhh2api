@@ -97,7 +97,7 @@ function formatMessagesToPrompt(messages) {
       }
     }
   }
-  return formattedMessages.join("\n");
+  return formattedMessages.join("\n\n");
 }
 
 function formatOpenAITools(openaiTools) {
