@@ -505,8 +505,8 @@ export default async function handler(request) {
         <div class="info-section">
             <div class="info-title">API 端点</div>
             <div style="font-size: 14px; color: #6e6e73; line-height: 1.5;">
-                <strong>模型列表:</strong> GET /api/v1/models<br>
-                <strong>请求聊天:</strong> POST /api/v1/chat/completions<br>
+                <strong>模型列表:</strong> GET /v1/models<br>
+                <strong>请求聊天:</strong> POST /v1/chat/completions<br>
             </div>
         </div>
 
@@ -621,7 +621,7 @@ export default async function handler(request) {
             }
 
             try {
-                const response = await fetch('/api/v1/models', {
+                const response = await fetch('/v1/models', {
                     headers: {
                         'Authorization': \`Bearer \${apiKey}\`
                     }
@@ -664,7 +664,7 @@ export default async function handler(request) {
             \`;
 
             try {
-                const response = await fetch('/api/v1/models', {
+                const response = await fetch('/v1/models', {
                     headers: {
                         'Authorization': \`Bearer \${apiKey}\`
                     }
