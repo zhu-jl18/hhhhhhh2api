@@ -395,13 +395,20 @@ export default async function handler(req, res) {
       }
     } else {
       // 非流式响应
+      console.log('发送到 Highlight API 的数据:', JSON.stringify(highlightData, null, 2));
+      console.log('请求头:', JSON.stringify(headers, null, 2));
+      
       const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(highlightData),
       });
 
+      console.log(`Highlight API 响应状态: ${response.status}`);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log('Highlight API 错误响应:', errorText);
         return res.status(response.status).json({
           error: { message: `Highlight API returned status code ${response.status}`, type: "api_error" }
         });
