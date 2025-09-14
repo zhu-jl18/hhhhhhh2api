@@ -6,7 +6,10 @@
       "Bash(git commit:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "mcp__Playwright__browser_navigate"
+      "mcp__Playwright__browser_navigate",
+      "mcp__Playwright__browser_type",
+      "mcp__Playwright__browser_click",
+      "Bash(curl -X GET \"https://hhhhhhh2api.vercel.app/v1/models\" -H \"Authorization: Bearer eyJydCI6ImVYZjdldlF5STJtSGJ3NUxtT3EOQ2VVcTMiLCJ1c2VyX2lkIjoidXNlcl8wMUs1MldHMjNXVEs5MDVHUzAwV1FONzg4UCIsImVtYWlsIjoiaGVsbG93b3JsZEB5dTA0MTAucXp6LmlvIiwiY2xpZW50X3V1aWQiOiIwMDhiYjMwMS04ODFiLTQzNmQtODliMC1mNDVlODA4YzE3NjEifQ==\")"
     ],
     "deny": [],
     "ask": []

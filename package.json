@@ -1,7 +1,7 @@
 {
   "name": "highlight2api-vercel",
   "version": "1.0.0",
-  "description": "Highlight AI API 代理服务 - Vercel Edge Functions 版本",
+  "description": "Highlight AI API 代理服务 - Vercel Node.js Functions 版本",
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
@@ -12,7 +12,7 @@
     "highlight-ai",
     "openai-api",
     "vercel",
-    "edge-functions",
+    "node-functions",
     "ai-proxy"
   ],
   "author": "三文鱼",

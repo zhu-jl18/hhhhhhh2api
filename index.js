@@ -1,4 +1,4 @@
-// Vercel Edge Functions 版本 - 主页面
+// Vercel Node.js Functions - 主页重定向
 
 function getCorsHeaders() {
   return {
@@ -9,28 +9,21 @@ function getCorsHeaders() {
   };
 }
 
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(request) {
+export default async function handler(req, res) {
+  // CORS 设置
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Max-Age', '86400');
+  
   // CORS 预检请求
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: getCorsHeaders()
-    });
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
   }
 
-  // 只处理 GET 请求
-  if (request.method !== 'GET') {
-    return new Response('Method not allowed', {
-      status: 405,
-      headers: getCorsHeaders()
-    });
-  }
-
-  const html = `
+  // 重定向到静态 HTML 文件
+  return res.redirect(302, '/index.html');
+}
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
