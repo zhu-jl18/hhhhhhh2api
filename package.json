@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "vercel build",
     "deploy": "vercel --prod",
     "preview": "vercel"
   },
@@ -18,9 +17,6 @@
   ],
   "author": "三文鱼",
   "license": "MIT",
-  "devDependencies": {
-    "@vercel/node": "^3.0.0"
-  },
   "engines": {
     "node": ">=18"
   }
