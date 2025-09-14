@@ -1,7 +1,7 @@
 // Vercel Node.js Functions - 聊天完成 API
 
 const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
-const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61 Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
 
 function base64Decode(str) {
   const binaryString = Buffer.from(str, 'base64').toString('binary');
@@ -395,8 +395,7 @@ export default async function handler(req, res) {
       }
     } else {
       // 非流式响应
-      console.log('发送到 Highlight API 的数据:', JSON.stringify(highlightData, null, 2));
-      console.log('请求头:', JSON.stringify(headers, null, 2));
+      // Remove debug logging
       
       const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
         method: 'POST',
@@ -404,11 +403,7 @@ export default async function handler(req, res) {
         body: JSON.stringify(highlightData),
       });
 
-      console.log(`Highlight API 响应状态: ${response.status}`);
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Highlight API 错误响应:', errorText);
         return res.status(response.status).json({
           error: { message: `Highlight API returned status code ${response.status}`, type: "api_error" }
         });

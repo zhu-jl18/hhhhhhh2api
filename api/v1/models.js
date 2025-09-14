@@ -1,7 +1,7 @@
 // Vercel Node.js Functions - 模型列表 API
 
 const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
-const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61 Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
 
 // ... existing code ...
 const Hr = {
