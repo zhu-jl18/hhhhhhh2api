@@ -1,7 +1,6 @@
-// Vercel Node.js Functions - 聊天完成 API (完整移植deno.ts版本)
-const { HIGHLIGHT_BASE_URL, USER_AGENT, parseApiKey, getAccessToken, getHighlightHeaders } = require('../../lib/auth');
+// Vercel Node.js Functions - 聊天完成 API (完整移植deno.ts版本 - 无identifier)
+const { HIGHLIGHT_BASE_URL, USER_AGENT, parseApiKey, getAccessToken } = require('../../lib/auth');
 const { handleCors, formatMessagesToPrompt, formatOpenAITools, generateUUID } = require('../../lib/utils');
-const { getIdentifier } = require('../../lib/crypto');
 
 async function getModels(accessToken) {
   const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
@@ -68,7 +67,7 @@ module.exports = async function handler(req, res) {
 
     const prompt = formatMessagesToPrompt(reqData.messages);
     const tools = formatOpenAITools(reqData.tools);
-    const identifier = await getIdentifier(userInfo.user_id, userInfo.client_uuid);
+    // 暂时不使用identifier
 
     const highlightData = {
       prompt: prompt,
@@ -82,7 +81,13 @@ module.exports = async function handler(req, res) {
       timezone: "Asia/Hong_Kong",
     };
 
-    const headers = getHighlightHeaders(accessToken, identifier);
+    // 暂时不使用identifier，避免crypto依赖问题
+    const headers = {
+      "accept": "*/*",
+      "authorization": `Bearer ${accessToken}`,
+      "content-type": "application/json",
+      "user-agent": USER_AGENT,
+    };
 
     if (reqData.stream) {
       // 流式响应 - 设置SSE headers
