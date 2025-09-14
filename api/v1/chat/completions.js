@@ -1,106 +1,150 @@
-// 完全按照deno.ts实现的Node.js版本
-const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
-
-function parseApiKey(apiKeyBase64) {
-  try {
-    const decoded = Buffer.from(apiKeyBase64, 'base64').toString('utf8')
-      .replace(/[\u0000-\u001f\u007f-\u009f]/g, ''); // 清理控制字符
-    return JSON.parse(decoded);
-  } catch {
-    return null;
-  }
-}
-
-async function refreshAccessToken(rt) {
-  const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken: rt }),
-  });
-
-  if (!response.ok) {
-    throw new Error("无法刷新access token");
-  }
-
-  const respJson = await response.json();
-  if (!respJson.success) {
-    throw new Error("刷新access token失败");
-  }
-
-  return respJson.data.accessToken;
-}
-
-function formatMessagesToPrompt(messages) {
-  const formattedMessages = [];
-  for (const message of messages) {
-    if (message.role && message.content) {
-      if (Array.isArray(message.content)) {
-        for (const item of message.content) {
-          formattedMessages.push(`${message.role}: ${item.text}`);
-        }
-      } else {
-        formattedMessages.push(`${message.role}: ${message.content}`);
-      }
-    }
-  }
-  return formattedMessages.join("\n\n");
-}
+const { HIGHLIGHT_BASE_URL, parseApiKey, getAccessToken, getHighlightHeaders } = require('../../../lib/auth');
+const { formatMessagesToPrompt, formatOpenAITools, handleCors } = require('../../../lib/utils');
+const { getIdentifier } = require('../../../lib/crypto');
 
 module.exports = async function handler(req, res) {
-  // CORS处理
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (handleCors(req, res)) return;
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "Missing authorization token" });
-    }
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ error: 'Missing authorization token' });
 
     const token = authHeader.substring(7);
     const userInfo = parseApiKey(token);
+    if (!userInfo || !userInfo.rt) return res.status(401).json({ error: 'Invalid authorization token' });
+    if (!userInfo.user_id || !userInfo.client_uuid) return res.status(401).json({ error: 'Invalid authorization token - missing required fields' });
 
-    if (!userInfo || !userInfo.rt) {
-      return res.status(401).json({ error: "Invalid authorization token" });
+    const reqData = req.body || {};
+    const accessToken = await getAccessToken(userInfo.rt);
+
+    const highlightHeaders = getHighlightHeaders(accessToken, await getIdentifier(userInfo.user_id, userInfo.client_uuid));
+
+    const prompt = formatMessagesToPrompt(reqData.messages || []);
+    const tools = formatOpenAITools(reqData.tools || []);
+
+    let modelId = reqData.model || 'gpt-4o';
+    const modelResolve = async () => {
+      try {
+        const r = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (!r.ok) return null;
+        const j = await r.json();
+        if (!j.success) return null;
+        const found = j.data.find(m => m.name === modelId);
+        return found ? found.id : null;
+      } catch { return null; }
+    };
+
+    const modelResolvedId = await modelResolve();
+    if (!modelResolvedId) return res.status(400).json({ error: `Model '${modelId}' not found` });
+
+    const highlightData = {
+      prompt,
+      attachedContext: [],
+      modelId: modelResolvedId,
+      additionalTools: tools,
+      backendPlugins: [],
+      useMemory: false,
+      useKnowledge: false,
+      ephemeral: false,
+      timezone: 'Asia/Hong_Kong',
+    };
+
+    if (reqData.stream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      const upstream = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+        method: 'POST',
+        headers: highlightHeaders,
+        body: JSON.stringify(highlightData),
+      });
+
+      if (!upstream.ok) {
+        res.write(`data: ${JSON.stringify({ error: { message: `Highlight API returned status code ${upstream.status}`, type: 'api_error' } })}\n\n`);
+        return res.end();
+      }
+
+      const responseId = `chatcmpl-${Date.now()}`;
+      const created = Math.floor(Date.now() / 1000);
+      res.write(`data: ${JSON.stringify({ id: responseId, object: 'chat.completion.chunk', created, model: modelId, choices: [{ index: 0, delta: { role: 'assistant' }, finish_reason: null }] })}\n\n`);
+
+      const reader = upstream.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      const pump = async () => {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value);
+          while (buffer.includes('\n')) {
+            const lineEnd = buffer.indexOf('\n');
+            const line = buffer.slice(0, lineEnd);
+            buffer = buffer.slice(lineEnd + 1);
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+              if (!data) continue;
+              try {
+                const ev = JSON.parse(data);
+                if (ev.type === 'text' && ev.content) {
+                  res.write(`data: ${JSON.stringify({ id: responseId, object: 'chat.completion.chunk', created, model: modelId, choices: [{ index: 0, delta: { content: ev.content }, finish_reason: null }] })}\n\n`);
+                }
+              } catch {}
+            }
+          }
+        }
+        res.write(`data: ${JSON.stringify({ id: responseId, object: 'chat.completion.chunk', created, model: modelId, choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] })}\n\n`);
+        res.write('data: [DONE]\n\n');
+        res.end();
+      };
+
+      pump();
+      return;
     }
 
-    if (!userInfo.user_id || !userInfo.client_uuid) {
-      return res.status(401).json({ error: "Invalid authorization token - missing required fields" });
+    const upstream = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+      method: 'POST',
+      headers: highlightHeaders,
+      body: JSON.stringify(highlightData),
+    });
+
+    if (!upstream.ok) return res.status(upstream.status).json({ error: { message: `Highlight API returned status code ${upstream.status}`, type: 'api_error' } });
+
+    const reader = upstream.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value);
+      while (buffer.includes('\n')) {
+        const lineEnd = buffer.indexOf('\n');
+        const line = buffer.slice(0, lineEnd);
+        buffer = buffer.slice(lineEnd + 1);
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+          if (!data) continue;
+          try {
+            const ev = JSON.parse(data);
+            if (ev.type === 'text' && ev.content) full += ev.content;
+          } catch {}
+        }
+      }
     }
 
-    const reqData = req.body;
-    const accessToken = await refreshAccessToken(userInfo.rt);
-
+    const responseId = `chatcmpl-${Date.now()}`;
     return res.status(200).json({
-      id: `chatcmpl-${Date.now()}`,
-      object: "chat.completion",
+      id: responseId,
+      object: 'chat.completion',
       created: Math.floor(Date.now() / 1000),
-      model: reqData.model || "gpt-4o",
-      choices: [{
-        index: 0,
-        message: {
-          role: "assistant",
-          content: `✅ Token刷新成功！现在可以正常使用API了。Access Token: ${accessToken.substring(0, 20)}...`
-        },
-        finish_reason: "stop",
-      }],
-      usage: { prompt_tokens: 10, completion_tokens: 20, total_tokens: 30 },
+      model: modelId,
+      choices: [{ index: 0, message: { role: 'assistant', content: full }, finish_reason: 'stop' }],
+      usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
     });
-
   } catch (error) {
-    return res.status(500).json({
-      error: error.message
-    });
+    return res.status(500).json({ error: error.message });
   }
 };
