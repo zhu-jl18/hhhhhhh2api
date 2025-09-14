@@ -1,0 +1,3145 @@
+╭───────────────────────────────────────────────────╮
+│ ✻ Welcome to Claude Code!                         │
+│                                                   │
+│   /help for help, /status for your current setup  │
+│                                                   │
+│   cwd: X:\Projcet\hilight2API                     │
+│                                                   │
+│   ─────────────────────────────────────────────── │
+│                                                   │
+│   Overrides (via env):                            │
+│                                                   │
+│   • API Base URL: https://api.aicodeditor.com     │
+╰───────────────────────────────────────────────────╯
+
+> /mcp 
+  ⎿  Failed to reconnect to open-websearch.
+
+> 读代码，测试 本项目的部署 地址 https://hhhhhhh2api.vercel.app/ 以及 临时密钥
+   eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNlcl8wMUs0Wlk
+  2UzRXNU1UNDBCQ0ZUQzU3MThZRCIsImVtYWlsIjoiZmlzaDAwMkBjaGV5dS5xenouaW8iLCJjbGl
+  lbnRfdXVpZCI6Ijg5OGM0ODhiLTBiMzMtNDZmZC04NThiLTFmY2UwZDQyNTgwMSJ9，注意 
+  deno.ts 是 最开始的部署到deno平台上的成功版本，现在的工作是移植到vercel平台
+  ，现在的代码有很多错误和冗余，请你详细分析和清理，实现正常的功能
+
+● 我来帮您分析和清理这个项目，先创建任务列表，然后测试部署地址并分析代码。
+
+● 先测试API功能：
+
+● Bash(curl -X GET "https://hhhhhhh2api.vercel.app/v1/models" -H
+      "Authorization: Bearer eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c
+      2VyX2lkIjoidXNlcl8wMUs0Wlk2UzR…)
+  ⎿  {                              
+       "object": "list",
+       "data": [
+     … +100 lines (ctrl+o to expand)
+
+● 现在分析项目代码结构：
+
+● Search(pattern: "**/*")
+  ⎿  Found 19 files (ctrl+o to expand)
+
+● Read(deno.ts)
+  ⎿  Read 1637 lines (ctrl+o to expand)
+
+● Read(vercel.json)
+  ⎿  Read 20 lines (ctrl+o to expand)
+
+● Read(api\v1\models.js)
+  ⎿  Read 169 lines (ctrl+o to expand)
+
+● Read(api\v1\chat\completions.js)
+  ⎿  Read 477 lines (ctrl+o to expand)
+
+● Read(index.js)
+  ⎿  Read 26 lines (ctrl+o to expand)
+
+● 现在对比deno.ts与当前Vercel版本的关键差异：
+
+● Read(api\login.js)
+  ⎿  Read 140 lines (ctrl+o to expand)
+                                                                           
+●User approved Claude's plan:
+  ⎿ 根据代码分析，我发现了一些关键问题并制定了优化计划：
+
+    分析结果
+
+    ✅ 功能状态
+
+    - 部署地址 https://hhhhhhh2api.vercel.app/ 正常工作
+    - /v1/models 端点返回15个模型（Azure OpenAI、Anthropic、Google 
+    Gemini、XAI Grok等）
+    - API结构符合 OpenAI 兼容格式
+
+    🐛 发现的问题
+
+    1. 代码重复问题
+
+    - api/v1/models.js 和 api/v1/chat/completions.js 中大量重复代码
+    - 加密函数（Hr、jr、Ah、Fl等）在多个文件重复定义
+    - base64解码、token刷新等工具函数重复实现
+
+    2. Node.js 平台兼容性问题
+
+    - completions.js 中使用了 Deno 专有的加密API（crypto.subtle）
+    - 流处理使用了 Deno 的 ReadableStream 语法，与 Node.js 不完全兼容
+    - 一些异步导入可能在 Vercel 环境中有问题
+
+    3. 错误处理和优化
+
+    - 缺少统一的错误处理
+    - 没有实现 token 缓存机制
+    - UUID 生成函数重复定义
+
+    优化计划
+
+    1. 创建共享工具模块
+
+    - 提取重复的加密函数到 lib/crypto.js
+    - 创建 lib/auth.js 处理token刷新和验证
+    - 创建 lib/utils.js 存放通用工具函数
+
+    2. 修复平台兼容性
+
+    - 将 Deno 的 crypto.subtle 替换为 Node.js crypto 模块
+    - 修复流处理逻辑适配 Node.js 环境
+    - 统一异步操作处理
+
+    3. 优化API逻辑
+
+    - 实现 token 缓存减少重复请求
+    - 统一错误处理和响应格式
+    - 优化流式响应的实现
+
+    4. 清理冗余文件
+
+    - 删除不必要的测试文件和调试代码
+    - 整理项目结构使其更清晰
+
+    这个计划将显著减少代码重复，提高可维护性，并确保在 Vercel 
+    平台上的稳定运行。
+
+> 请进行测试，同时我给你一个deno平台部署好的能够正常使用的地址 
+  https://aiiaaiia.96ai.top
+
+● 好的，我先测试一下你提供的deno平台地址来对比功能，然后开始优化代码。
+
+● Bash(curl -X GET "https://aiiaaiia.96ai.top/v1/models" -H "Authorization:
+      Bearer eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNlc
+      l8wMUs0Wlk2UzRXNU1U…)
+  ⎿  {                              
+       "object": "list",
+       "data": [
+     … +100 lines (ctrl+o to expand)
+
+● 好的，两个版本返回的模型数据一致。现在开始创建lib目录和共享工具模块：
+
+● Write(lib\crypto.js)
+  ⎿  Wrote 1 lines to lib\crypto.js                                        
+     const crypto = require('crypto');
+     // 原始加密常量
+     const Hr = {
+       r: [87, 78, 72, 56, 79, 48, 122, 79, 107, 104, 82, 119, 51, 100, 78,
+     90, 85, 85, 69, 107, 90, 116, 87, 48, 108,
+           53, 83, 84, 70, 81, 121, 69],
+       m: [27, 26, 25, 22, 24, 21, 17, 12, 30, 19, 20, 14, 31, 8, 18, 10,
+     13, 5, 29, 7, 16, 6, 28, 23, 9, 15, 4, 0, 11,
+           2, 3, 1]
+     };
+
+> 同样的，我希望入口就是 部署地址/ 后边的 而不是多加一层/api/
+
+● 理解了，我会在优化时确保入口路径直接在根目录下。现在继续创建auth模块：
+
+● Write(lib\auth.js)
+  ⎿  Wrote 1 lines to lib\auth.js                                         
+     const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
+     const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) 
+     AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61 
+     Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
+     // Token缓存
+     const tokenCache = new Map();
+     function base64Decode(str) {
+       const binaryString = Buffer.from(str, 'base64').toString('binary');
+       const bytes = new Uint8Array(binaryString.length);
+       for (let i = 0; i < binaryString.length; i++) {
+
+● Write(lib\utils.js)
+  ⎿  Wrote 1 lines to lib\utils.js                                    
+     function generateUUID() {
+       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+     function(c) {
+         const r = Math.random() * 16 | 0;
+         const v = c == 'x' ? r : (r & 0x3 | 0x8);
+         return v.toString(16);
+       });
+     }
+     function getCorsHeaders() {
+       return {
+
+● 现在开始修复vercel.json以支持直接路径访问，然后重写API文件：
+
+● Update(vercel.json)
+  ⎿  Updated vercel.json with 11 additions      
+        1    {
+        2 +    "functions": {
+        3 +      "api/v1/models.js": {
+        4 +        "maxDuration": 30
+        5 +      },
+        6 +      "api/v1/chat/completions.js": {
+        7 +        "maxDuration": 60
+        8 +      },
+        9 +      "api/login.js": {
+       10 +        "maxDuration": 30
+       11 +      }
+       12 +    },
+       13      "rewrites": [
+       14        {
+       15          "source": "/v1/models",
+
+● 现在重写models.js，使用共享模块并修复Node.js兼容性问题：
+
+● Update(api\v1\models.js)
+  ⎿  Error editing file
+
+> 如果你需要我补充任何信息 请随时停下来 向我提问即可
+
+● 好的，我重新完整重写models.js文件：
+
+● Write(api\v1\models.js)
+  ⎿  Updated api\v1\models.js with 71 additions and 169 removals         
+         1 -  // Vercel Node.js Functions - 模型列表 API
+         2 -  
+         3 -  const HIGHLIGHT_BASE_URL = 
+           - "https://chat-backend.highlightai.com";
+         4 -  const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; 
+           - x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61
+           -  Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
+         5 -  
+         6 -  // ... existing code ...
+         7 -  const Hr = {
+         8 -    r: [87, 78, 72, 56, 79, 48, 122, 79, 107, 104, 82, 119, 
+           - 51, 100, 78, 90, 85, 85, 69, 107, 90, 116, 87, 48, 108,
+         9 -        53, 83, 84, 70, 81, 121, 69],
+        10 -    m: [27, 26, 25, 22, 24, 21, 17, 12, 30, 19, 20, 14, 31, 
+           - 8, 18, 10, 13, 5, 29, 7, 16, 6, 28, 23, 9, 15, 4, 0, 11,
+        11 -        2, 3, 1]
+        12 -  };
+        13 -  
+        14 -  const jr = {
+        15 -    r: [87, 90, 109, 107, 53, 105, 81, 89, 103, 107, 68, 49, 
+           - 68, 105, 106, 77, 49, 106, 53, 78, 77, 78, 106, 106, 61,
+        16 -        77, 89, 51, 66, 79, 86, 89, 106, 65, 106, 52, 89, 77,
+           -  87, 106, 89, 122, 78, 90, 65, 89, 50, 105, 61, 90, 106,
+        17 -        66, 48, 53, 71, 89, 87, 52, 81, 84, 78, 90, 74, 78, 
+           - 103, 50, 70, 79, 51, 50, 50, 77, 122, 108, 84, 81, 120,
+        18 -        90, 89, 89, 89, 79, 119, 122, 121, 108, 69, 77],
+        19 -    m: [65, 20, 1, 6, 31, 63, 74, 12, 85, 78, 33, 3, 41, 19, 
+           - 45, 52, 75, 21, 23, 16, 56, 36, 5, 71, 87, 68, 72, 15,
+        20 -        18, 32, 82, 8, 17, 54, 83, 35, 28, 48, 49, 77, 30, 
+           - 25, 10, 38, 22, 50, 29, 11, 86, 64, 57, 70, 47, 67, 81, 44,
+        21 -        61, 7, 58, 13, 84, 76, 42, 24, 46, 37, 62, 80, 27, 
+           - 51, 73, 34, 69, 39, 53, 2, 79, 60, 26, 0, 66, 40, 55, 9,
+        22 -        59, 43, 14, 4]
+        23 -  };
+        24 -  
+        25 -  function Ah(n, e) {
+        26 -    const t = new Array(n.length);
+        27 -    for (let s = 0; s < e.length; s++) {
+        28 -      t[e[s]] = n[s];
+        29 -    }
+        30 -    return t;
+        31 -  }
+        32 -  
+        33 -  function Fl(n, e) {
+        34 -    const t = Ah(n, e);
+        35 -    const s = String.fromCharCode(...t);
+        36 -    const binaryString = Buffer.from(s, 
+           - 'base64').toString('binary');
+        37 -    const bytes = new Uint8Array(binaryString.length);
+        38 -    for (let i = 0; i < binaryString.length; i++) {
+        39 -      bytes[i] = binaryString.charCodeAt(i);
+        40 -    }
+        41 -    const i = Array.from(bytes).reverse();
+        42 -    return new TextDecoder().decode(new Uint8Array(i));
+        43 -  }
+        44 -  
+        45 -  async function fetchModelsFromUpstream(accessToken) {
+        46 -    const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+        47 -      headers: {
+        48 -        'Authorization': `Bearer ${accessToken}`,
+        49 -        'User-Agent': USER_AGENT,
+        50 -      },
+        51 -    });
+        52 -  
+        53 -    if (!response.ok) {
+        54 -      throw new Error("获取模型列表失败");
+        55 -    }
+        56 -  
+        57 -    const respJson = await response.json();
+        58 -    if (!respJson.success) {
+        59 -      throw new Error("获取模型数据失败");
+        60 -    }
+        61 -  
+        62 -    const modelList = [];
+        63 -    for (const model of respJson.data) {
+        64 -      modelList.push({
+        65 -        id: model.name,
+        66 -        object: "model",
+        67 -        created: Math.floor(Date.now() / 1000),
+        68 -        owned_by: model.provider,
+        69 -      });
+        70 -    }
+        71 -  
+        72 -    return modelList;
+        73 -  }
+        74 -  
+        75 -  async function getAccessToken(userInfo) {
+        76 -    // 刷新 access token
+        77 -    const tokenResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
+        78 -      method: 'POST',
+        79 -      headers: {
+        80 -        'Content-Type': 'application/json',
+        81 -        'User-Agent': USER_AGENT,
+        82 -      },
+        83 -      body: JSON.stringify({
+        84 -        refreshToken: userInfo.rt,
+        85 -      }),
+        86 -    });
+        87 -  
+        88 -    if (!tokenResponse.ok) {
+        89 -      throw new Error("Token刷新失败");
+        90 -    }
+        91 -  
+        92 -    const tokenData = await tokenResponse.json();
+        93 -    if (!tokenData.success) {
+        94 -      throw new Error("Token刷新失败");
+        95 -    }
+        96 -  
+        97 -    return tokenData.data.accessToken;
+        98 -  }
+        99 -  
+       100 -  function getCorsHeaders() {
+       101 -    return {
+       102 -      "Access-Control-Allow-Origin": "*",
+       103 -      "Access-Control-Allow-Methods": "GET, POST, PUT, 
+           - DELETE, OPTIONS",
+       104 -      "Access-Control-Allow-Headers": "Content-Type, 
+           - Authorization, X-Requested-With",
+       105 -      "Access-Control-Max-Age": "86400",
+       106 -    };
+       107 -  }
+       108 -  
+       109 -  function base64Decode(str) {
+       110 -    const binaryString = Buffer.from(str, 
+           - 'base64').toString('binary');
+       111 -    const bytes = new Uint8Array(binaryString.length);
+       112 -    for (let i = 0; i < binaryString.length; i++) {
+       113 -      bytes[i] = binaryString.charCodeAt(i);
+       114 -    }
+       115 -    return bytes;
+       116 -  }
+       117 -  
+       118 -  function parseApiKey(apiKeyBase64) {
+       119 -    try {
+       120 -      const decoded = new 
+           - TextDecoder().decode(base64Decode(apiKeyBase64));
+       121 -      return JSON.parse(decoded);
+       122 -    } catch {
+       123 -      return null;
+       124 -    }
+       125 -  }
+       126 -  
+       127 -  export default async function handler(req, res) {
+       128 -    // CORS 设置
+       129 -    res.setHeader('Access-Control-Allow-Origin', '*');
+       130 -    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           -  PUT, DELETE, OPTIONS');
+       131 -    res.setHeader('Access-Control-Allow-Headers', 
+           - 'Content-Type, Authorization, X-Requested-With');
+       132 -    res.setHeader('Access-Control-Max-Age', '86400');
+       133 -    
+       134 -    // CORS 预检请求
+       135 -    if (req.method === 'OPTIONS') {
+       136 -      return res.status(204).end();
+       137 -    }
+       138 -  
+       139 -    // 只处理 GET 请求
+       140 -    if (req.method !== 'GET') {
+       141 -      return res.status(405).json({ error: 'Method not 
+           - allowed' });
+       142 -    }
+       143 -  
+       144 -    // 获取并验证 Bearer token
+       145 -    const authHeader = req.headers.authorization;
+       146 -    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+       147 -      return res.status(401).json({ error: "Missing 
+           - authorization token" });
+       148 -    }
+       149 -  
+       150 -    const token = authHeader.substring(7);
+       151 -    const userInfo = parseApiKey(token);
+       152 -  
+       153 -    if (!userInfo || !userInfo.rt) {
+       154 -      return res.status(401).json({ error: "Invalid 
+           - authorization token" });
+       155 -    }
+       156 -  
+       157 -    try {
+       158 -      // 获取访问令牌并获取真实模型列表
+       159 -      const accessToken = await getAccessToken(userInfo);
+       160 -      const modelList = await 
+           - fetchModelsFromUpstream(accessToken);
+       161 -  
+       162 -      return res.status(200).json({
+       163 -        object: "list",
+       164 -        data: modelList
+       165 -      });
+       166 -    } catch (error) {
+       167 -      return res.status(500).json({ error: error.message });
+       168 -    }
+       169 -  }
+         1   \ No newline at end of file
+         2 +  // Vercel Node.js Functions - 模型列表 API
+         3 +  const { HIGHLIGHT_BASE_URL, USER_AGENT, parseApiKey, 
+           + getAccessToken } = require('../../lib/auth');
+         4 +  const { handleCors } = require('../../lib/utils');
+         5 +  
+         6 +  async function fetchModelsFromUpstream(accessToken) {
+         7 +    const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+         8 +      headers: {
+         9 +        'Authorization': `Bearer ${accessToken}`,
+        10 +        'User-Agent': USER_AGENT,
+        11 +      },
+        12 +    });
+        13 +  
+        14 +    if (!response.ok) {
+        15 +      throw new Error("获取模型列表失败");
+        16 +    }
+        17 +  
+        18 +    const respJson = await response.json();
+        19 +    if (!respJson.success) {
+        20 +      throw new Error("获取模型数据失败");
+        21 +    }
+        22 +  
+        23 +    const modelList = [];
+        24 +    for (const model of respJson.data) {
+        25 +      modelList.push({
+        26 +        id: model.name,
+        27 +        object: "model",
+        28 +        created: Math.floor(Date.now() / 1000),
+        29 +        owned_by: model.provider,
+        30 +      });
+        31 +    }
+        32 +  
+        33 +    return modelList;
+        34 +  }
+        35 +  
+        36 +  module.exports = async function handler(req, res) {
+        37 +    // 处理 CORS
+        38 +    if (handleCors(req, res)) {
+        39 +      return; // OPTIONS 请求已处理
+        40 +    }
+        41 +  
+        42 +    // 只处理 GET 请求
+        43 +    if (req.method !== 'GET') {
+        44 +      return res.status(405).json({ error: 'Method not 
+           + allowed' });
+        45 +    }
+        46 +  
+        47 +    // 获取并验证 Bearer token
+        48 +    const authHeader = req.headers.authorization;
+        49 +    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        50 +      return res.status(401).json({ error: "Missing 
+           + authorization token" });
+        51 +    }
+        52 +  
+        53 +    const token = authHeader.substring(7);
+        54 +    const userInfo = parseApiKey(token);
+        55 +  
+        56 +    if (!userInfo || !userInfo.rt) {
+        57 +      return res.status(401).json({ error: "Invalid 
+           + authorization token" });
+        58 +    }
+        59 +  
+        60 +    try {
+        61 +      // 获取访问令牌并获取真实模型列表
+        62 +      const accessToken = await getAccessToken(userInfo.rt);
+        63 +      const modelList = await 
+           + fetchModelsFromUpstream(accessToken);
+        64 +  
+        65 +      return res.status(200).json({
+        66 +        object: "list",
+        67 +        data: modelList
+        68 +      });
+        69 +    } catch (error) {
+        70 +      return res.status(500).json({ error: error.message });
+        71 +    }
+        72 +  };
+        73   \ No newline at end of file
+
+● 现在重写completions.js，这是最复杂的文件，需要修复流处理的Node.js兼容性：
+
+● Write(api\v1\chat\completions.js)
+  ⎿  Updated api\v1\chat\completions.js with 273 additions and 477 removals
+         1 -  // Vercel Node.js Functions - 聊天完成 API
+         2 -  
+         3 -  const HIGHLIGHT_BASE_URL = 
+           - "https://chat-backend.highlightai.com";
+         4 -  const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; 
+           - x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61
+           -  Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
+         5 -  
+         6 -  function base64Decode(str) {
+         7 -    const binaryString = Buffer.from(str, 
+           - 'base64').toString('binary');
+         8 -    const bytes = new Uint8Array(binaryString.length);
+         9 -    for (let i = 0; i < binaryString.length; i++) {
+        10 -      bytes[i] = binaryString.charCodeAt(i);
+        11 -    }
+        12 -    return bytes;
+        13 -  }
+        14 -  
+        15 -  function parseApiKey(apiKeyBase64) {
+        16 -    try {
+        17 -      const decoded = new 
+           - TextDecoder().decode(base64Decode(apiKeyBase64));
+        18 -      return JSON.parse(decoded);
+        19 -    } catch {
+        20 -      return null;
+        21 -    }
+        22 -  }
+        23 -  
+        24 -  async function getAccessToken(userInfo) {
+        25 -    // 刷新 access token
+        26 -    const tokenResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
+        27 -      method: 'POST',
+        28 -      headers: {
+        29 -        'Content-Type': 'application/json',
+        30 -        'User-Agent': USER_AGENT,
+        31 -      },
+        32 -      body: JSON.stringify({
+        33 -        refreshToken: userInfo.rt,
+        34 -      }),
+        35 -    });
+        36 -  
+        37 -    if (!tokenResponse.ok) {
+        38 -      throw new Error("Token刷新失败");
+        39 -    }
+        40 -  
+        41 -    const tokenData = await tokenResponse.json();
+        42 -    if (!tokenData.success) {
+        43 -      throw new Error("Token刷新失败");
+        44 -    }
+        45 -  
+        46 -    return tokenData.data.accessToken;
+        47 -  }
+        48 -  
+        49 -  async function getModels(accessToken) {
+        50 -    const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+        51 -      headers: {
+        52 -        'Authorization': `Bearer ${accessToken}`,
+        53 -        'User-Agent': USER_AGENT,
+        54 -      },
+        55 -    });
+        56 -  
+        57 -    if (!response.ok) {
+        58 -      throw new Error("获取模型列表失败");
+        59 -    }
+        60 -  
+        61 -    const respJson = await response.json();
+        62 -    if (!respJson.success) {
+        63 -      throw new Error("获取模型数据失败");
+        64 -    }
+        65 -  
+        66 -    const modelMap = new Map();
+        67 -    for (const model of respJson.data) {
+        68 -      modelMap.set(model.name, {
+        69 -        id: model.id,
+        70 -        name: model.name,
+        71 -        provider: model.provider,
+        72 -        isFree: model.pricing?.isFree || false,
+        73 -      });
+        74 -    }
+        75 -  
+        76 -    return modelMap;
+        77 -  }
+        78 -  
+        79 -  function formatMessagesToPrompt(messages) {
+        80 -    const formattedMessages = [];
+        81 -    for (const message of messages) {
+        82 -      if (message.role) {
+        83 -        if (message.content) {
+        84 -          if (Array.isArray(message.content)) {
+        85 -            for (const item of message.content) {
+        86 -              formattedMessages.push(`${message.role}: 
+           - ${item.text}`);
+        87 -            }
+        88 -          } else {
+        89 -            formattedMessages.push(`${message.role}: 
+           - ${message.content}`);
+        90 -          }
+        91 -        }
+        92 -        if (message.tool_calls) {
+        93 -          formattedMessages.push(`${message.role}: 
+           - ${JSON.stringify(message.tool_calls)}`);
+        94 -        }
+        95 -        if (message.tool_call_id) {
+        96 -          formattedMessages.push(`${message.role}: 
+           - tool_call_id: ${message.tool_call_id} ${message.content}`);
+        97 -        }
+        98 -      }
+        99 -    }
+       100 -    return formattedMessages.join("\n\n");
+       101 -  }
+       102 -  
+       103 -  function formatOpenAITools(openaiTools) {
+       104 -    if (!openaiTools) return [];
+       105 -  
+       106 -    return openaiTools.map(tool => ({
+       107 -      name: tool.function.name,
+       108 -      description: tool.function.description,
+       109 -      parameters: tool.function.parameters,
+       110 -    }));
+       111 -  }
+       112 -  
+       113 -  // 原始加密常量和函数
+       114 -  const Hr = {
+       115 -    r: [87, 78, 72, 56, 79, 48, 122, 79, 107, 104, 82, 119, 
+           - 51, 100, 78, 90, 85, 85, 69, 107, 90, 116, 87, 48, 108,
+       116 -        53, 83, 84, 70, 81, 121, 69],
+       117 -    m: [27, 26, 25, 22, 24, 21, 17, 12, 30, 19, 20, 14, 31, 
+           - 8, 18, 10, 13, 5, 29, 7, 16, 6, 28, 23, 9, 15, 4, 0, 11,
+       118 -        2, 3, 1]
+       119 -  };
+       120 -  
+       121 -  const jr = {
+       122 -    r: [87, 90, 109, 107, 53, 105, 81, 89, 103, 107, 68, 49, 
+           - 68, 105, 106, 77, 49, 106, 53, 78, 77, 78, 106, 106, 61,
+       123 -        77, 89, 51, 66, 79, 86, 89, 106, 65, 106, 52, 89, 77,
+           -  87, 106, 89, 122, 78, 90, 65, 89, 50, 105, 61, 90, 106,
+       124 -        66, 48, 53, 71, 89, 87, 52, 81, 84, 78, 90, 74, 78, 
+           - 103, 50, 70, 79, 51, 50, 50, 77, 122, 108, 84, 81, 120,
+       125 -        90, 89, 89, 89, 79, 119, 122, 121, 108, 69, 77],
+       126 -    m: [65, 20, 1, 6, 31, 63, 74, 12, 85, 78, 33, 3, 41, 19, 
+           - 45, 52, 75, 21, 23, 16, 56, 36, 5, 71, 87, 68, 72, 15,
+       127 -        18, 32, 82, 8, 17, 54, 83, 35, 28, 48, 49, 77, 30, 
+           - 25, 10, 38, 22, 50, 29, 11, 86, 64, 57, 70, 47, 67, 81, 44,
+       128 -        61, 7, 58, 13, 84, 76, 42, 24, 46, 37, 62, 80, 27, 
+           - 51, 73, 34, 69, 39, 53, 2, 79, 60, 26, 0, 66, 40, 55, 9,
+       129 -        59, 43, 14, 4]
+       130 -  };
+       131 -  
+       132 -  function Ah(n, e) {
+       133 -    const t = new Array(n.length);
+       134 -    for (let s = 0; s < e.length; s++) {
+       135 -      t[e[s]] = n[s];
+       136 -    }
+       137 -    return t;
+       138 -  }
+       139 -  
+       140 -  function Fl(n, e) {
+       141 -    const t = Ah(n, e);
+       142 -    const s = String.fromCharCode(...t);
+       143 -    const binaryString = Buffer.from(s, 
+           - 'base64').toString('binary');
+       144 -    const bytes = new Uint8Array(binaryString.length);
+       145 -    for (let i = 0; i < binaryString.length; i++) {
+       146 -      bytes[i] = binaryString.charCodeAt(i);
+       147 -    }
+       148 -    const i = Array.from(bytes).reverse();
+       149 -    return new TextDecoder().decode(new Uint8Array(i));
+       150 -  }
+       151 -  
+       152 -  async function pbkdf2(password, salt, iterations, keyLen) {
+       153 -    const crypto = await import('crypto');
+       154 -    return new Promise((resolve, reject) => {
+       155 -      crypto.pbkdf2(password, salt, iterations, keyLen, 
+           - 'sha256', (err, derivedKey) => {
+       156 -        if (err) reject(err);
+       157 -        else resolve(new Uint8Array(derivedKey));
+       158 -      });
+       159 -    });
+       160 -  }
+       161 -  
+       162 -  async function Th(n) {
+       163 -    const salt = new TextEncoder().encode(Fl(Hr.r, Hr.m));
+       164 -    return await pbkdf2(n, salt, 100000, 32);
+       165 -  }
+       166 -  
+       167 -  async function kh(n, fixedIv) {
+       168 -    const crypto = await import('crypto');
+       169 -    const e = await Th(n.userId);
+       170 -    const t = fixedIv || crypto.randomBytes(16);
+       171 -    
+       172 -    const data = {
+       173 -      ...n,
+       174 -      apiKey: Fl(jr.r, jr.m)
+       175 -    };
+       176 -    
+       177 -    const jsonStr = JSON.stringify(data);
+       178 -    const jsonBytes = new TextEncoder().encode(jsonStr);
+       179 -    
+       180 -    // PKCS7 padding
+       181 -    const padLen = 16 - (jsonBytes.length % 16);
+       182 -    const paddedData = new Uint8Array(jsonBytes.length + 
+           - padLen);
+       183 -    paddedData.set(jsonBytes);
+       184 -    paddedData.fill(padLen, jsonBytes.length);
+       185 -    
+       186 -    const cipher = crypto.createCipheriv('aes-256-cbc', e, 
+           - t);
+       187 -    const encrypted = 
+           - Buffer.concat([cipher.update(Buffer.from(paddedData)), 
+           - cipher.final()]);
+       188 -    
+       189 -    const tHex = Array.from(t).map(b => 
+           - b.toString(16).padStart(2, '0')).join('');
+       190 -    const encryptedHex = Array.from(encrypted).map(b => 
+           - b.toString(16).padStart(2, '0')).join('');
+       191 -    
+       192 -    return `${tHex}:${encryptedHex}`;
+       193 -  }
+       194 -  
+       195 -  async function H7t(t = 12) {
+       196 -    const crypto = await import('crypto');
+       197 -    const randomBytes = crypto.randomBytes(t);
+       198 -    return Array.from(randomBytes).map(b => 
+           - b.toString(16).padStart(2, '0')).join('');
+       199 -  }
+       200 -  
+       201 -  async function getIdentifier(userId, clientUUID, fixedIv) {
+       202 -    const t = await kh({ userId, clientUUID }, fixedIv);
+       203 -    const randomHex = await H7t();
+       204 -    return `${randomHex}:${t}`;
+       205 -  }
+       206 -  
+       207 -  function getHighlightHeaders(accessToken, identifier) {
+       208 -    const headers = {
+       209 -      "accept": "*/*",
+       210 -      "accept-encoding": "gzip, deflate, br, zstd",
+       211 -      "accept-language": "zh-CN",
+       212 -      "authorization": `Bearer ${accessToken}`,
+       213 -      "content-type": "application/json",
+       214 -      "user-agent": USER_AGENT,
+       215 -    };
+       216 -  
+       217 -    if (identifier) {
+       218 -      headers["identifier"] = identifier;
+       219 -    }
+       220 -  
+       221 -    return headers;
+       222 -  }
+       223 -  
+       224 -  export default async function handler(req, res) {
+       225 -    // CORS 设置
+       226 -    res.setHeader('Access-Control-Allow-Origin', '*');
+       227 -    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           -  PUT, DELETE, OPTIONS');
+       228 -    res.setHeader('Access-Control-Allow-Headers', 
+           - 'Content-Type, Authorization, X-Requested-With');
+       229 -    res.setHeader('Access-Control-Max-Age', '86400');
+       230 -    
+       231 -    // CORS 预检请求
+       232 -    if (req.method === 'OPTIONS') {
+       233 -      return res.status(204).end();
+       234 -    }
+       235 -  
+       236 -    // 只处理 POST 请求
+       237 -    if (req.method !== 'POST') {
+       238 -      return res.status(405).json({ error: 'Method not 
+           - allowed' });
+       239 -    }
+       240 -  
+       241 -    // 获取并验证 Bearer token
+       242 -    const authHeader = req.headers.authorization;
+       243 -    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+       244 -      return res.status(401).json({ error: "Missing 
+           - authorization token" });
+       245 -    }
+       246 -  
+       247 -    const token = authHeader.substring(7);
+       248 -    const userInfo = parseApiKey(token);
+       249 -  
+       250 -    if (!userInfo || !userInfo.rt) {
+       251 -      return res.status(401).json({ error: "Invalid 
+           - authorization token" });
+       252 -    }
+       253 -  
+       254 -    try {
+       255 -      const reqData = req.body;
+       256 -  
+       257 -      if (!userInfo.user_id || !userInfo.client_uuid) {
+       258 -        return res.status(401).json({ error: "Invalid 
+           - authorization token - missing required fields" });
+       259 -      }
+       260 -  
+       261 -      const accessToken = await getAccessToken(userInfo);
+       262 -      const models = await getModels(accessToken);
+       263 -      const modelInfo = models.get(reqData.model || 
+           - "gpt-4o");
+       264 -  
+       265 -      if (!modelInfo) {
+       266 -        return res.status(400).json({ error: `Model 
+           - '${reqData.model}' not found` });
+       267 -      }
+       268 -  
+       269 -      const prompt = 
+           - formatMessagesToPrompt(reqData.messages);
+       270 -      const tools = formatOpenAITools(reqData.tools);
+       271 -      const identifier = await 
+           - getIdentifier(userInfo.user_id, userInfo.client_uuid);
+       272 -  
+       273 -      const highlightData = {
+       274 -        prompt: prompt,
+       275 -        attachedContext: [],
+       276 -        modelId: modelInfo.id,
+       277 -        additionalTools: tools,
+       278 -        backendPlugins: [],
+       279 -        useMemory: false,
+       280 -        useKnowledge: false,
+       281 -        ephemeral: false,
+       282 -        timezone: "Asia/Hong_Kong",
+       283 -      };
+       284 -  
+       285 -      const headers = getHighlightHeaders(accessToken, 
+           - identifier);
+       286 -  
+       287 -      if (reqData.stream) {
+       288 -        // 流式响应
+       289 -        res.setHeader('Content-Type', 'text/event-stream');
+       290 -        res.setHeader('Cache-Control', 'no-cache');
+       291 -        res.setHeader('Connection', 'keep-alive');
+       292 -  
+       293 -        try {
+       294 -          const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       295 -            method: 'POST',
+       296 -            headers: headers,
+       297 -            body: JSON.stringify(highlightData),
+       298 -          });
+       299 -  
+       300 -          if (!response.ok) {
+       301 -            res.write(`data: ${JSON.stringify({
+       302 -              error: { message: `Highlight API returned 
+           - status code ${response.status}`, type: "api_error" }
+       303 -            })}\n\n`);
+       304 -            return res.end();
+       305 -          }
+       306 -  
+       307 -          const responseId = `chatcmpl-${generateUUID()}`;
+       308 -          const created = Math.floor(Date.now() / 1000);
+       309 -  
+       310 -          // 发送初始消息
+       311 -          const initialChunk = {
+       312 -            id: responseId,
+       313 -            object: "chat.completion.chunk",
+       314 -            created: created,
+       315 -            model: reqData.model || "gpt-4o",
+       316 -            choices: [{
+       317 -              index: 0,
+       318 -              delta: { role: "assistant" },
+       319 -              finish_reason: null,
+       320 -            }],
+       321 -          };
+       322 -          res.write(`data: 
+           - ${JSON.stringify(initialChunk)}\n\n`);
+       323 -  
+       324 -          const reader = response.body;
+       325 -          let buffer = "";
+       326 -  
+       327 -          reader.on('data', (chunk) => {
+       328 -            buffer += chunk.toString();
+       329 -  
+       330 -            while (buffer.includes("\n")) {
+       331 -              const lineEnd = buffer.indexOf("\n");
+       332 -              const line = buffer.substring(0, lineEnd);
+       333 -              buffer = buffer.substring(lineEnd + 1);
+       334 -  
+       335 -              if (line.startsWith("data: ")) {
+       336 -                const data = line.substring(6).trim();
+       337 -                if (data) {
+       338 -                  try {
+       339 -                    const eventData = JSON.parse(data);
+       340 -                    if (eventData.type === "text") {
+       341 -                      const content = eventData.content || 
+           - "";
+       342 -                      if (content) {
+       343 -                        const chunkData = {
+       344 -                          id: responseId,
+       345 -                          object: "chat.completion.chunk",
+       346 -                          created: created,
+       347 -                          model: reqData.model || "gpt-4o",
+       348 -                          choices: [{
+       349 -                            index: 0,
+       350 -                            delta: { content: content },
+       351 -                            finish_reason: null,
+       352 -                          }],
+       353 -                        };
+       354 -                        res.write(`data: 
+           - ${JSON.stringify(chunkData)}\n\n`);
+       355 -                      }
+       356 -                    }
+       357 -                  } catch {
+       358 -                    // 忽略无效的JSON数据
+       359 -                  }
+       360 -                }
+       361 -              }
+       362 -            }
+       363 -          });
+       364 -  
+       365 -          reader.on('end', () => {
+       366 -            // 发送完成消息
+       367 -            const finalChunk = {
+       368 -              id: responseId,
+       369 -              object: "chat.completion.chunk",
+       370 -              created: created,
+       371 -              model: reqData.model || "gpt-4o",
+       372 -              choices: [{
+       373 -                index: 0,
+       374 -                delta: {},
+       375 -                finish_reason: "stop",
+       376 -              }],
+       377 -            };
+       378 -            res.write(`data: 
+           - ${JSON.stringify(finalChunk)}\n\n`);
+       379 -            res.write("data: [DONE]\n\n");
+       380 -            res.end();
+       381 -          });
+       382 -  
+       383 -          reader.on('error', (error) => {
+       384 -            res.write(`data: ${JSON.stringify({
+       385 -              error: { message: error.message, type: 
+           - "server_error" }
+       386 -            })}\n\n`);
+       387 -            res.end();
+       388 -          });
+       389 -  
+       390 -        } catch (error) {
+       391 -          res.write(`data: ${JSON.stringify({
+       392 -            error: { message: error.message, type: 
+           - "server_error" }
+       393 -          })}\n\n`);
+       394 -          res.end();
+       395 -        }
+       396 -      } else {
+       397 -        // 非流式响应
+       398 -        // Remove debug logging
+       399 -        
+       400 -        const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       401 -          method: 'POST',
+       402 -          headers: headers,
+       403 -          body: JSON.stringify(highlightData),
+       404 -        });
+       405 -  
+       406 -        if (!response.ok) {
+       407 -          return res.status(response.status).json({
+       408 -            error: { message: `Highlight API returned status 
+           - code ${response.status}`, type: "api_error" }
+       409 -          });
+       410 -        }
+       411 -  
+       412 -        let fullResponse = "";
+       413 -        const reader = response.body;
+       414 -        let buffer = "";
+       415 -  
+       416 -        return new Promise((resolve, reject) => {
+       417 -          reader.on('data', (chunk) => {
+       418 -            buffer += chunk.toString();
+       419 -  
+       420 -            while (buffer.includes("\n")) {
+       421 -              const lineEnd = buffer.indexOf("\n");
+       422 -              const line = buffer.substring(0, lineEnd);
+       423 -              buffer = buffer.substring(lineEnd + 1);
+       424 -  
+       425 -              if (line.startsWith("data: ")) {
+       426 -                const data = line.substring(6).trim();
+       427 -                if (data) {
+       428 -                  try {
+       429 -                    const eventData = JSON.parse(data);
+       430 -                    if (eventData.type === "text") {
+       431 -                      fullResponse += eventData.content || 
+           - "";
+       432 -                    }
+       433 -                  } catch {
+       434 -                    // 忽略无效的JSON数据
+       435 -                  }
+       436 -                }
+       437 -              }
+       438 -            }
+       439 -          });
+       440 -  
+       441 -          reader.on('end', () => {
+       442 -            const responseId = `chatcmpl-${generateUUID()}`;
+       443 -            const responseData = {
+       444 -              id: responseId,
+       445 -              object: "chat.completion",
+       446 -              created: Math.floor(Date.now() / 1000),
+       447 -              model: reqData.model || "gpt-4o",
+       448 -              choices: [{
+       449 -                index: 0,
+       450 -                message: { role: "assistant", content: 
+           - fullResponse },
+       451 -                finish_reason: "stop",
+       452 -              }],
+       453 -              usage: { prompt_tokens: 0, completion_tokens: 
+           - 0, total_tokens: 0 },
+       454 -            };
+       455 -  
+       456 -            res.status(200).json(responseData);
+       457 -            resolve();
+       458 -          });
+       459 -  
+       460 -          reader.on('error', (error) => {
+       461 -            res.status(500).json({ error: error.message });
+       462 -            reject(error);
+       463 -          });
+       464 -        });
+       465 -      }
+       466 -    } catch (error) {
+       467 -      return res.status(500).json({ error: error.message });
+       468 -    }
+       469 -  }
+       470 -  
+       471 -  function generateUUID() {
+       472 -    return 
+           - 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+           - function(c) {
+       473 -      const r = Math.random() * 16 | 0;
+       474 -      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+       475 -      return v.toString(16);
+       476 -    });
+       477 -  }
+         1   \ No newline at end of file
+         2 +  // Vercel Node.js Functions - 聊天完成 API
+         3 +  const { HIGHLIGHT_BASE_URL, parseApiKey, getAccessToken, 
+           + getHighlightHeaders } = require('../../lib/auth');
+         4 +  const { handleCors, formatMessagesToPrompt, 
+           + formatOpenAITools, generateUUID } = 
+           + require('../../lib/utils');
+         5 +  const { getIdentifier } = require('../../lib/crypto');
+         6 +  
+         7 +  async function getModels(accessToken) {
+         8 +    const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+         9 +      headers: {
+        10 +        'Authorization': `Bearer ${accessToken}`,
+        11 +        'User-Agent': require('../../lib/auth').USER_AGENT,
+        12 +      },
+        13 +    });
+        14 +  
+        15 +    if (!response.ok) {
+        16 +      throw new Error("获取模型列表失败");
+        17 +    }
+        18 +  
+        19 +    const respJson = await response.json();
+        20 +    if (!respJson.success) {
+        21 +      throw new Error("获取模型数据失败");
+        22 +    }
+        23 +  
+        24 +    const modelMap = new Map();
+        25 +    for (const model of respJson.data) {
+        26 +      modelMap.set(model.name, {
+        27 +        id: model.id,
+        28 +        name: model.name,
+        29 +        provider: model.provider,
+        30 +        isFree: model.pricing?.isFree || false,
+        31 +      });
+        32 +    }
+        33 +  
+        34 +    return modelMap;
+        35 +  }
+        36 +  
+        37 +  module.exports = async function handler(req, res) {
+        38 +    // 处理 CORS
+        39 +    if (handleCors(req, res)) {
+        40 +      return; // OPTIONS 请求已处理
+        41 +    }
+        42 +  
+        43 +    // 只处理 POST 请求
+        44 +    if (req.method !== 'POST') {
+        45 +      return res.status(405).json({ error: 'Method not 
+           + allowed' });
+        46 +    }
+        47 +  
+        48 +    // 获取并验证 Bearer token
+        49 +    const authHeader = req.headers.authorization;
+        50 +    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        51 +      return res.status(401).json({ error: "Missing 
+           + authorization token" });
+        52 +    }
+        53 +  
+        54 +    const token = authHeader.substring(7);
+        55 +    const userInfo = parseApiKey(token);
+        56 +  
+        57 +    if (!userInfo || !userInfo.rt) {
+        58 +      return res.status(401).json({ error: "Invalid 
+           + authorization token" });
+        59 +    }
+        60 +  
+        61 +    try {
+        62 +      const reqData = req.body;
+        63 +  
+        64 +      if (!userInfo.user_id || !userInfo.client_uuid) {
+        65 +        return res.status(401).json({ error: "Invalid 
+           + authorization token - missing required fields" });
+        66 +      }
+        67 +  
+        68 +      const accessToken = await getAccessToken(userInfo.rt);
+        69 +      const models = await getModels(accessToken);
+        70 +      const modelInfo = models.get(reqData.model || 
+           + "gpt-4o");
+        71 +  
+        72 +      if (!modelInfo) {
+        73 +        return res.status(400).json({ error: `Model 
+           + '${reqData.model}' not found` });
+        74 +      }
+        75 +  
+        76 +      const prompt = 
+           + formatMessagesToPrompt(reqData.messages);
+        77 +      const tools = formatOpenAITools(reqData.tools);
+        78 +      const identifier = await 
+           + getIdentifier(userInfo.user_id, userInfo.client_uuid);
+        79 +  
+        80 +      const highlightData = {
+        81 +        prompt: prompt,
+        82 +        attachedContext: [],
+        83 +        modelId: modelInfo.id,
+        84 +        additionalTools: tools,
+        85 +        backendPlugins: [],
+        86 +        useMemory: false,
+        87 +        useKnowledge: false,
+        88 +        ephemeral: false,
+        89 +        timezone: "Asia/Hong_Kong",
+        90 +      };
+        91 +  
+        92 +      const headers = getHighlightHeaders(accessToken, 
+           + identifier);
+        93 +  
+        94 +      if (reqData.stream) {
+        95 +        // 流式响应
+        96 +        res.setHeader('Content-Type', 'text/event-stream');
+        97 +        res.setHeader('Cache-Control', 'no-cache');
+        98 +        res.setHeader('Connection', 'keep-alive');
+        99 +  
+       100 +        try {
+       101 +          const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       102 +            method: 'POST',
+       103 +            headers: headers,
+       104 +            body: JSON.stringify(highlightData),
+       105 +          });
+       106 +  
+       107 +          if (!response.ok) {
+       108 +            res.write(`data: ${JSON.stringify({
+       109 +              error: { message: `Highlight API returned 
+           + status code ${response.status}`, type: "api_error" }
+       110 +            })}\n\n`);
+       111 +            return res.end();
+       112 +          }
+       113 +  
+       114 +          const responseId = `chatcmpl-${generateUUID()}`;
+       115 +          const created = Math.floor(Date.now() / 1000);
+       116 +  
+       117 +          // 发送初始消息
+       118 +          const initialChunk = {
+       119 +            id: responseId,
+       120 +            object: "chat.completion.chunk",
+       121 +            created: created,
+       122 +            model: reqData.model || "gpt-4o",
+       123 +            choices: [{
+       124 +              index: 0,
+       125 +              delta: { role: "assistant" },
+       126 +              finish_reason: null,
+       127 +            }],
+       128 +          };
+       129 +          res.write(`data: 
+           + ${JSON.stringify(initialChunk)}\n\n`);
+       130 +  
+       131 +          const reader = response.body;
+       132 +          let buffer = "";
+       133 +  
+       134 +          reader.on('data', (chunk) => {
+       135 +            buffer += chunk.toString();
+       136 +  
+       137 +            while (buffer.includes("\n")) {
+       138 +              const lineEnd = buffer.indexOf("\n");
+       139 +              const line = buffer.substring(0, lineEnd);
+       140 +              buffer = buffer.substring(lineEnd + 1);
+       141 +  
+       142 +              if (line.startsWith("data: ")) {
+       143 +                const data = line.substring(6).trim();
+       144 +                if (data) {
+       145 +                  try {
+       146 +                    const eventData = JSON.parse(data);
+       147 +                    if (eventData.type === "text") {
+       148 +                      const content = eventData.content || 
+           + "";
+       149 +                      if (content) {
+       150 +                        const chunkData = {
+       151 +                          id: responseId,
+       152 +                          object: "chat.completion.chunk",
+       153 +                          created: created,
+       154 +                          model: reqData.model || "gpt-4o",
+       155 +                          choices: [{
+       156 +                            index: 0,
+       157 +                            delta: { content: content },
+       158 +                            finish_reason: null,
+       159 +                          }],
+       160 +                        };
+       161 +                        res.write(`data: 
+           + ${JSON.stringify(chunkData)}\n\n`);
+       162 +                      }
+       163 +                    }
+       164 +                  } catch {
+       165 +                    // 忽略无效的JSON数据
+       166 +                  }
+       167 +                }
+       168 +              }
+       169 +            }
+       170 +          });
+       171 +  
+       172 +          reader.on('end', () => {
+       173 +            // 发送完成消息
+       174 +            const finalChunk = {
+       175 +              id: responseId,
+       176 +              object: "chat.completion.chunk",
+       177 +              created: created,
+       178 +              model: reqData.model || "gpt-4o",
+       179 +              choices: [{
+       180 +                index: 0,
+       181 +                delta: {},
+       182 +                finish_reason: "stop",
+       183 +              }],
+       184 +            };
+       185 +            res.write(`data: 
+           + ${JSON.stringify(finalChunk)}\n\n`);
+       186 +            res.write("data: [DONE]\n\n");
+       187 +            res.end();
+       188 +          });
+       189 +  
+       190 +          reader.on('error', (error) => {
+       191 +            res.write(`data: ${JSON.stringify({
+       192 +              error: { message: error.message, type: 
+           + "server_error" }
+       193 +            })}\n\n`);
+       194 +            res.end();
+       195 +          });
+       196 +  
+       197 +        } catch (error) {
+       198 +          res.write(`data: ${JSON.stringify({
+       199 +            error: { message: error.message, type: 
+           + "server_error" }
+       200 +          })}\n\n`);
+       201 +          res.end();
+       202 +        }
+       203 +      } else {
+       204 +        // 非流式响应
+       205 +        const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       206 +          method: 'POST',
+       207 +          headers: headers,
+       208 +          body: JSON.stringify(highlightData),
+       209 +        });
+       210 +  
+       211 +        if (!response.ok) {
+       212 +          return res.status(response.status).json({
+       213 +            error: { message: `Highlight API returned status 
+           + code ${response.status}`, type: "api_error" }
+       214 +          });
+       215 +        }
+       216 +  
+       217 +        let fullResponse = "";
+       218 +        const reader = response.body;
+       219 +        let buffer = "";
+       220 +  
+       221 +        return new Promise((resolve, reject) => {
+       222 +          reader.on('data', (chunk) => {
+       223 +            buffer += chunk.toString();
+       224 +  
+       225 +            while (buffer.includes("\n")) {
+       226 +              const lineEnd = buffer.indexOf("\n");
+       227 +              const line = buffer.substring(0, lineEnd);
+       228 +              buffer = buffer.substring(lineEnd + 1);
+       229 +  
+       230 +              if (line.startsWith("data: ")) {
+       231 +                const data = line.substring(6).trim();
+       232 +                if (data) {
+       233 +                  try {
+       234 +                    const eventData = JSON.parse(data);
+       235 +                    if (eventData.type === "text") {
+       236 +                      fullResponse += eventData.content || 
+           + "";
+       237 +                    }
+       238 +                  } catch {
+       239 +                    // 忽略无效的JSON数据
+       240 +                  }
+       241 +                }
+       242 +              }
+       243 +            }
+       244 +          });
+       245 +  
+       246 +          reader.on('end', () => {
+       247 +            const responseId = `chatcmpl-${generateUUID()}`;
+       248 +            const responseData = {
+       249 +              id: responseId,
+       250 +              object: "chat.completion",
+       251 +              created: Math.floor(Date.now() / 1000),
+       252 +              model: reqData.model || "gpt-4o",
+       253 +              choices: [{
+       254 +                index: 0,
+       255 +                message: { role: "assistant", content: 
+           + fullResponse },
+       256 +                finish_reason: "stop",
+       257 +              }],
+       258 +              usage: { prompt_tokens: 0, completion_tokens: 
+           + 0, total_tokens: 0 },
+       259 +            };
+       260 +  
+       261 +            res.status(200).json(responseData);
+       262 +            resolve();
+       263 +          });
+       264 +  
+       265 +          reader.on('error', (error) => {
+       266 +            res.status(500).json({ error: error.message });
+       267 +            reject(error);
+       268 +          });
+       269 +        });
+       270 +      }
+       271 +    } catch (error) {
+       272 +      return res.status(500).json({ error: error.message });
+       273 +    }
+       274 +  };
+       275   \ No newline at end of file
+
+● 现在更新login.js文件：
+
+● Write(api\login.js)
+  ⎿  Updated api\login.js with 126 additions and 140 removals            
+         1 -  // Vercel Node.js Functions - 登录端点
+         2 -  
+         3 -  const HIGHLIGHT_BASE_URL = 
+           - "https://chat-backend.highlightai.com";
+         4 -  
+         5 -  function generateUUID() {
+         6 -    return 
+           - 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+           - function(c) {
+         7 -      const r = Math.random() * 16 | 0;
+         8 -      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+         9 -      return v.toString(16);
+        10 -    });
+        11 -  }
+        12 -  
+        13 -  async function login(code) {
+        14 -    console.log("开始登录流程...");
+        15 -  
+        16 -    const chromeDeviceId = generateUUID();
+        17 -    const deviceId = generateUUID();
+        18 -  
+        19 -    // 第一步：交换code获取tokens
+        20 -    const exchangeResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/exchange`, {
+        21 -      method: 'POST',
+        22 -      headers: {
+        23 -        'Content-Type': 'application/json',
+        24 -      },
+        25 -      body: JSON.stringify({
+        26 -        code: code,
+        27 -        amplitudeDeviceId: chromeDeviceId,
+        28 -      }),
+        29 -    });
+        30 -  
+        31 -    if (!exchangeResponse.ok) {
+        32 -      const errorText = await exchangeResponse.text();
+        33 -      console.error(`HTTP错误: ${exchangeResponse.status} 
+           - ${errorText}`);
+        34 -  
+        35 -      if (exchangeResponse.status === 500) {
+        36 -        throw new Error("服务器内部错误，请稍后重试");
+        37 -      } else if (exchangeResponse.status === 400) {
+        38 -        throw new 
+           - Error("请求格式错误，请检查授权代码是否正确");
+        39 -      } else {
+        40 -        throw new Error(`登录服务暂时不可用 (错误代码: 
+           - ${exchangeResponse.status})`);
+        41 -      }
+        42 -    }
+        43 -  
+        44 -    const exchangeData = await exchangeResponse.json();
+        45 -    if (!exchangeData.success) {
+        46 -      console.error(`登录失败详情:`, exchangeData);
+        47 -  
+        48 -      const errorMessage = exchangeData.error || "未知错误";
+        49 -  
+        50 -      if (errorMessage.includes("expired") || 
+           - errorMessage.includes("invalid")) {
+        51 -        throw new Error("授权代码已过期或无效。授权代码只能使
+           - 用一次，请重新登录获取新的代码。");
+        52 -      } else if (errorMessage.includes("not found")) {
+        53 -        throw new 
+           - Error("授权代码不存在，请检查是否复制完整。");
+        54 -      } else if (errorMessage.includes("already used")) {
+        55 -        throw new 
+           - Error("此授权代码已被使用过，请重新登录获取新的代码。");
+        56 -      } else if (errorMessage.includes("rate limit")) {
+        57 -        throw new Error("请求过于频繁，请稍等片刻后重试。");
+        58 -      } else {
+        59 -        throw new Error(`登录失败: 
+           - ${errorMessage}。如果问题持续存在，请重新获取授权代码。`);
+        60 -      }
+        61 -    }
+        62 -  
+        63 -    const accessToken = exchangeData.data.accessToken;
+        64 -    const refreshToken = exchangeData.data.refreshToken;
+        65 -  
+        66 -    // 第二步：注册客户端
+        67 -    const clientResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/users/me/client`, {
+        68 -      method: 'POST',
+        69 -      headers: {
+        70 -        'Content-Type': 'application/json',
+        71 -        'Authorization': `Bearer ${accessToken}`,
+        72 -      },
+        73 -      body: JSON.stringify({
+        74 -        client_uuid: deviceId,
+        75 -      }),
+        76 -    });
+        77 -  
+        78 -    if (!clientResponse.ok) {
+        79 -      console.warn(`客户端注册失败: 
+           - ${clientResponse.status}，但继续进行...`);
+        80 -    }
+        81 -  
+        82 -    // 第三步：获取用户信息
+        83 -    const profileResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/profile`, {
+        84 -      headers: {
+        85 -        'Authorization': `Bearer ${accessToken}`,
+        86 -      },
+        87 -    });
+        88 -  
+        89 -    if (!profileResponse.ok) {
+        90 -      const errorText = await profileResponse.text();
+        91 -      console.error(`获取用户信息失败: 
+           - ${profileResponse.status} ${errorText}`);
+        92 -      throw new Error(`无法获取用户信息，请重试。如果问题持续
+           - 存在，请重新登录。`);
+        93 -    }
+        94 -  
+        95 -    const profileData = await profileResponse.json();
+        96 -    const userId = profileData.id;
+        97 -    const email = profileData.email;
+        98 -  
+        99 -    console.log(`登录成功: ${userId} ${email}`);
+       100 -  
+       101 -    const userInfo = {
+       102 -      rt: refreshToken,
+       103 -      user_id: userId,
+       104 -      email: email,
+       105 -      client_uuid: deviceId,
+       106 -    };
+       107 -  
+       108 -    return userInfo;
+       109 -  }
+       110 -  
+       111 -  export default async function handler(req, res) {
+       112 -    // CORS 设置
+       113 -    res.setHeader('Access-Control-Allow-Origin', '*');
+       114 -    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           -  PUT, DELETE, OPTIONS');
+       115 -    res.setHeader('Access-Control-Allow-Headers', 
+           - 'Content-Type, Authorization, X-Requested-With');
+       116 -    res.setHeader('Access-Control-Max-Age', '86400');
+       117 -    
+       118 -    // CORS 预检请求
+       119 -    if (req.method === 'OPTIONS') {
+       120 -      return res.status(204).end();
+       121 -    }
+       122 -  
+       123 -    // 只处理 POST 请求
+       124 -    if (req.method !== 'POST') {
+       125 -      return res.status(405).json({ error: 'Method not 
+           - allowed' });
+       126 -    }
+       127 -  
+       128 -    try {
+       129 -      const { code } = req.body;
+       130 -  
+       131 -      if (!code) {
+       132 -        return res.status(400).json({ error: "Missing code 
+           - parameter" });
+       133 -      }
+       134 -  
+       135 -      const userInfo = await login(code);
+       136 -      return res.status(200).json(userInfo);
+       137 -    } catch (error) {
+       138 -      return res.status(500).json({ error: error.message });
+       139 -    }
+       140 -  }
+         1   \ No newline at end of file
+         2 +  // Vercel Node.js Functions - 登录端点
+         3 +  const { HIGHLIGHT_BASE_URL } = require('../lib/auth');
+         4 +  const { handleCors, generateUUID } = 
+           + require('../lib/utils');
+         5 +  
+         6 +  async function login(code) {
+         7 +    console.log("开始登录流程...");
+         8 +  
+         9 +    const chromeDeviceId = generateUUID();
+        10 +    const deviceId = generateUUID();
+        11 +  
+        12 +    // 第一步：交换code获取tokens
+        13 +    const exchangeResponse = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/exchange`, {
+        14 +      method: 'POST',
+        15 +      headers: {
+        16 +        'Content-Type': 'application/json',
+        17 +      },
+        18 +      body: JSON.stringify({
+        19 +        code: code,
+        20 +        amplitudeDeviceId: chromeDeviceId,
+        21 +      }),
+        22 +    });
+        23 +  
+        24 +    if (!exchangeResponse.ok) {
+        25 +      const errorText = await exchangeResponse.text();
+        26 +      console.error(`HTTP错误: ${exchangeResponse.status} 
+           + ${errorText}`);
+        27 +  
+        28 +      if (exchangeResponse.status === 500) {
+        29 +        throw new Error("服务器内部错误，请稍后重试");
+        30 +      } else if (exchangeResponse.status === 400) {
+        31 +        throw new 
+           + Error("请求格式错误，请检查授权代码是否正确");
+        32 +      } else {
+        33 +        throw new Error(`登录服务暂时不可用 (错误代码: 
+           + ${exchangeResponse.status})`);
+        34 +      }
+        35 +    }
+        36 +  
+        37 +    const exchangeData = await exchangeResponse.json();
+        38 +    if (!exchangeData.success) {
+        39 +      console.error(`登录失败详情:`, exchangeData);
+        40 +  
+        41 +      const errorMessage = exchangeData.error || "未知错误";
+        42 +  
+        43 +      if (errorMessage.includes("expired") || 
+           + errorMessage.includes("invalid")) {
+        44 +        throw new Error("授权代码已过期或无效。授权代码只能使
+           + 用一次，请重新登录获取新的代码。");
+        45 +      } else if (errorMessage.includes("not found")) {
+        46 +        throw new 
+           + Error("授权代码不存在，请检查是否复制完整。");
+        47 +      } else if (errorMessage.includes("already used")) {
+        48 +        throw new 
+           + Error("此授权代码已被使用过，请重新登录获取新的代码。");
+        49 +      } else if (errorMessage.includes("rate limit")) {
+        50 +        throw new Error("请求过于频繁，请稍等片刻后重试。");
+        51 +      } else {
+        52 +        throw new Error(`登录失败: 
+           + ${errorMessage}。如果问题持续存在，请重新获取授权代码。`);
+        53 +      }
+        54 +    }
+        55 +  
+        56 +    const accessToken = exchangeData.data.accessToken;
+        57 +    const refreshToken = exchangeData.data.refreshToken;
+        58 +  
+        59 +    // 第二步：注册客户端
+        60 +    const clientResponse = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/users/me/client`, {
+        61 +      method: 'POST',
+        62 +      headers: {
+        63 +        'Content-Type': 'application/json',
+        64 +        'Authorization': `Bearer ${accessToken}`,
+        65 +      },
+        66 +      body: JSON.stringify({
+        67 +        client_uuid: deviceId,
+        68 +      }),
+        69 +    });
+        70 +  
+        71 +    if (!clientResponse.ok) {
+        72 +      console.warn(`客户端注册失败: 
+           + ${clientResponse.status}，但继续进行...`);
+        73 +    }
+        74 +  
+        75 +    // 第三步：获取用户信息
+        76 +    const profileResponse = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/profile`, {
+        77 +      headers: {
+        78 +        'Authorization': `Bearer ${accessToken}`,
+        79 +      },
+        80 +    });
+        81 +  
+        82 +    if (!profileResponse.ok) {
+        83 +      const errorText = await profileResponse.text();
+        84 +      console.error(`获取用户信息失败: 
+           + ${profileResponse.status} ${errorText}`);
+        85 +      throw new Error(`无法获取用户信息，请重试。如果问题持续
+           + 存在，请重新登录。`);
+        86 +    }
+        87 +  
+        88 +    const profileData = await profileResponse.json();
+        89 +    const userId = profileData.id;
+        90 +    const email = profileData.email;
+        91 +  
+        92 +    console.log(`登录成功: ${userId} ${email}`);
+        93 +  
+        94 +    const userInfo = {
+        95 +      rt: refreshToken,
+        96 +      user_id: userId,
+        97 +      email: email,
+        98 +      client_uuid: deviceId,
+        99 +    };
+       100 +  
+       101 +    return userInfo;
+       102 +  }
+       103 +  
+       104 +  module.exports = async function handler(req, res) {
+       105 +    // 处理 CORS
+       106 +    if (handleCors(req, res)) {
+       107 +      return; // OPTIONS 请求已处理
+       108 +    }
+       109 +  
+       110 +    // 只处理 POST 请求
+       111 +    if (req.method !== 'POST') {
+       112 +      return res.status(405).json({ error: 'Method not 
+           + allowed' });
+       113 +    }
+       114 +  
+       115 +    try {
+       116 +      const { code } = req.body;
+       117 +  
+       118 +      if (!code) {
+       119 +        return res.status(400).json({ error: "Missing code 
+           + parameter" });
+       120 +      }
+       121 +  
+       122 +      const userInfo = await login(code);
+       123 +      return res.status(200).json(userInfo);
+       124 +    } catch (error) {
+       125 +      return res.status(500).json({ error: error.message });
+       126 +    }
+       127 +  };
+       128   \ No newline at end of file
+
+● 现在更新index.js文件：
+
+● Write(index.js)
+  ⎿  Updated index.js with 6 additions and 20 removals                   
+        1    // Vercel Node.js Functions - 主页重定向
+        2 +  const { handleCors } = require('./lib/utils');
+        3    
+        4 -  function getCorsHeaders() {
+        5 -    return {
+        6 -      "Access-Control-Allow-Origin": "*",
+        7 -      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE,
+          -  OPTIONS",
+        8 -      "Access-Control-Allow-Headers": "Content-Type, 
+          - Authorization, X-Requested-With",
+        9 -      "Access-Control-Max-Age": "86400",
+       10 -    };
+       11 -  }
+       12 -  
+       13 -  export default async function handler(req, res) {
+       14 -    // CORS 设置
+       15 -    res.setHeader('Access-Control-Allow-Origin', '*');
+       16 -    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, 
+          - PUT, DELETE, OPTIONS');
+       17 -    res.setHeader('Access-Control-Allow-Headers', 
+          - 'Content-Type, Authorization, X-Requested-With');
+       18 -    res.setHeader('Access-Control-Max-Age', '86400');
+       19 -    
+       20 -    // CORS 预检请求
+       21 -    if (req.method === 'OPTIONS') {
+       22 -      return res.status(204).end();
+        4 +  module.exports = async function handler(req, res) {
+        5 +    // 处理 CORS
+        6 +    if (handleCors(req, res)) {
+        7 +      return; // OPTIONS 请求已处理
+        8      }
+        9    
+       10      // 重定向到静态 HTML 文件
+       11      return res.redirect(302, '/index.html');
+       12 -  }
+       12   \ No newline at end of file
+       13 +  };
+       14   \ No newline at end of file
+
+● 现在清理一些不需要的文件：
+
+● Bash(rm "X:\Projcet\hilight2API\test-api.js"
+      "X:\Projcet\hilight2API\test-deployed.js"
+      "X:\Projcet\hilight2API\debug-chat.js")
+  ⎿  (No content)
+
+● 现在测试优化后的功能。由于改动较大，我需要测试API是否正常工作：
+
+● Bash(curl -X GET "https://hhhhhhh2api.vercel.app/v1/models" -H
+      "Authorization: Bearer eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c
+      2VyX2lkIjoidXNlcl8wMUs0Wlk2UzR…)
+  ⎿  {                              
+       "object": "list",
+       "data": [
+     … +101 lines (ctrl+o to expand)
+
+● 很好！models端点正常工作。现在测试聊天端点：
+
+● Bash(curl -X POST "https://hhhhhhh2api.vercel.app/v1/chat/completions" \
+        -H "Authorization: Bearer
+      eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNl…)
+  ⎿  A server error has occurred   
+
+     FUNCTION_INVOCATION_FAILED
+     … +11 lines (ctrl+o to expand)
+
+● 看来聊天端点有问题。让我检查错误并修复。应该是模块导入的路径问题：
+
+● Update(api\v1\chat\completions.js)
+  ⎿  Updated api\v1\chat\completions.js with 3 additions and 3 removals
+       1    // Vercel Node.js Functions - 聊天完成 API
+       2 -  const { HIGHLIGHT_BASE_URL, parseApiKey, getAccessToken, 
+         -  getHighlightHeaders } = require('../../lib/auth');
+       3 -  const { handleCors, formatMessagesToPrompt, 
+         -  formatOpenAITools, generateUUID } = require('../../
+         -  lib/utils');
+       4 -  const { getIdentifier } = require('../../lib/crypto');
+       2 +  const { HIGHLIGHT_BASE_URL, parseApiKey, getAccessToken, 
+         +  getHighlightHeaders } = require('../../../lib/auth');
+       3 +  const { handleCors, formatMessagesToPrompt, 
+         +  formatOpenAITools, generateUUID } = require('../../../
+         +  lib/utils');
+       4 +  const { getIdentifier } = require('../../../lib/crypto');
+       5    
+       6    async function getModels(accessToken) {
+       7      const response = await 
+           fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+
+● Update(api\v1\chat\completions.js)
+  ⎿  Updated api\v1\chat\completions.js with 1 addition and 1 removal    
+        7      const response = await 
+            fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+        8        headers: {
+        9          'Authorization': `Bearer ${accessToken}`,
+       10 -        'User-Agent': require('../../lib/auth').USER_AGENT,
+       10 +        'User-Agent': require('../../../lib/auth').USER_AGENT,
+       11        },
+       12      });
+       13    
+
+> 主要测试聊天功能 ，这个项目 我没记错的话 一个是通过注册信息提取 apikey  
+  一个是代理转发从而实现聊天接口
+
+● 是的，这个项目的核心功能就是：
+  1. 用户通过登录获取API Key（包含refresh token等信息）
+  2. 代理转发聊天请求到Highlight AI的后端
+
+  让我再次测试聊天功能，看看是否修复了路径问题：
+
+● Bash(curl -X POST "https://hhhhhhh2api.vercel.app/v1/chat/completions" \
+        -H "Authorization: Bearer
+      eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNl…)
+  ⎿  A server error has occurred   
+
+     FUNCTION_INVOCATION_FAILED
+     … +11 lines (ctrl+o to expand)
+
+● 还是有错误。让我检查一下crypto模块是否有问题。我注意到crypto模块中使用了No
+  de.js的require('crypto')，但这可能在Vercel环境中有问题。让我修复crypto.js
+  ：
+
+● Update(lib\crypto.js)
+  ⎿  Error editing file
+
+● Update(lib\crypto.js)
+  ⎿  Updated lib\crypto.js with 1 addition                 
+       54    }
+       55    
+       56    async function kh(n, fixedIv) {
+       57 +    const crypto = require('crypto');
+       58      const e = await Th(n.userId);
+       59      const t = fixedIv || crypto.randomBytes(16);
+       60    
+
+● Update(lib\crypto.js)
+  ⎿  Updated lib\crypto.js with 1 addition               
+       82    }
+       83    
+       84    function H7t(t = 12) {
+       85 +    const crypto = require('crypto');
+       86      const randomBytes = crypto.randomBytes(t);
+       87      return Array.from(randomBytes).map(b => 
+            b.toString(16).padStart(2, '0')).join('');
+       88    }
+
+● 现在再次测试：
+
+● Bash(curl -X POST "https://hhhhhhh2api.vercel.app/v1/chat/completions" \
+        -H "Authorization: Bearer
+      eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNl…)
+  ⎿  A server error has occurred   
+
+     FUNCTION_INVOCATION_FAILED
+     … +10 lines (ctrl+o to expand)
+
+● 让我简化聊天接口，先确保基本功能工作。我怀疑问题可能在于模块导入或加密相关
+  的复杂性。让我简化一下：
+
+● Write(api\v1\chat\completions.js)
+  ⎿  Updated api\v1\chat\completions.js with 384 additions and 272 removals
+         1 -  // Vercel Node.js Functions - 聊天完成 API
+         2 -  const { HIGHLIGHT_BASE_URL, parseApiKey, getAccessToken, 
+           - getHighlightHeaders } = require('../../../lib/auth');
+         3 -  const { handleCors, formatMessagesToPrompt, 
+           - formatOpenAITools, generateUUID } = 
+           - require('../../../lib/utils');
+         4 -  const { getIdentifier } = require('../../../lib/crypto');
+         5 -  
+         6 -  async function getModels(accessToken) {
+         7 -    const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+         8 -      headers: {
+         9 -        'Authorization': `Bearer ${accessToken}`,
+        10 -        'User-Agent': 
+           - require('../../../lib/auth').USER_AGENT,
+        11 -      },
+        12 -    });
+        13 -  
+        14 -    if (!response.ok) {
+        15 -      throw new Error("获取模型列表失败");
+        16 -    }
+        17 -  
+        18 -    const respJson = await response.json();
+        19 -    if (!respJson.success) {
+        20 -      throw new Error("获取模型数据失败");
+        21 -    }
+        22 -  
+        23 -    const modelMap = new Map();
+        24 -    for (const model of respJson.data) {
+        25 -      modelMap.set(model.name, {
+        26 -        id: model.id,
+        27 -        name: model.name,
+        28 -        provider: model.provider,
+        29 -        isFree: model.pricing?.isFree || false,
+        30 -      });
+        31 -    }
+        32 -  
+        33 -    return modelMap;
+        34 -  }
+        35 -  
+        36 -  module.exports = async function handler(req, res) {
+        37 -    // 处理 CORS
+        38 -    if (handleCors(req, res)) {
+        39 -      return; // OPTIONS 请求已处理
+        40 -    }
+        41 -  
+        42 -    // 只处理 POST 请求
+        43 -    if (req.method !== 'POST') {
+        44 -      return res.status(405).json({ error: 'Method not 
+           - allowed' });
+        45 -    }
+        46 -  
+        47 -    // 获取并验证 Bearer token
+        48 -    const authHeader = req.headers.authorization;
+        49 -    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        50 -      return res.status(401).json({ error: "Missing 
+           - authorization token" });
+        51 -    }
+        52 -  
+        53 -    const token = authHeader.substring(7);
+        54 -    const userInfo = parseApiKey(token);
+        55 -  
+        56 -    if (!userInfo || !userInfo.rt) {
+        57 -      return res.status(401).json({ error: "Invalid 
+           - authorization token" });
+        58 -    }
+        59 -  
+        60 -    try {
+        61 -      const reqData = req.body;
+        62 -  
+        63 -      if (!userInfo.user_id || !userInfo.client_uuid) {
+        64 -        return res.status(401).json({ error: "Invalid 
+           - authorization token - missing required fields" });
+        65 -      }
+        66 -  
+        67 -      const accessToken = await getAccessToken(userInfo.rt);
+        68 -      const models = await getModels(accessToken);
+        69 -      const modelInfo = models.get(reqData.model || 
+           - "gpt-4o");
+        70 -  
+        71 -      if (!modelInfo) {
+        72 -        return res.status(400).json({ error: `Model 
+           - '${reqData.model}' not found` });
+        73 -      }
+        74 -  
+        75 -      const prompt = 
+           - formatMessagesToPrompt(reqData.messages);
+        76 -      const tools = formatOpenAITools(reqData.tools);
+        77 -      const identifier = await 
+           - getIdentifier(userInfo.user_id, userInfo.client_uuid);
+        78 -  
+        79 -      const highlightData = {
+        80 -        prompt: prompt,
+        81 -        attachedContext: [],
+        82 -        modelId: modelInfo.id,
+        83 -        additionalTools: tools,
+        84 -        backendPlugins: [],
+        85 -        useMemory: false,
+        86 -        useKnowledge: false,
+        87 -        ephemeral: false,
+        88 -        timezone: "Asia/Hong_Kong",
+        89 -      };
+        90 -  
+        91 -      const headers = getHighlightHeaders(accessToken, 
+           - identifier);
+        92 -  
+        93 -      if (reqData.stream) {
+        94 -        // 流式响应
+        95 -        res.setHeader('Content-Type', 'text/event-stream');
+        96 -        res.setHeader('Cache-Control', 'no-cache');
+        97 -        res.setHeader('Connection', 'keep-alive');
+        98 -  
+        99 -        try {
+       100 -          const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       101 -            method: 'POST',
+       102 -            headers: headers,
+       103 -            body: JSON.stringify(highlightData),
+       104 -          });
+       105 -  
+       106 -          if (!response.ok) {
+       107 -            res.write(`data: ${JSON.stringify({
+       108 -              error: { message: `Highlight API returned 
+           - status code ${response.status}`, type: "api_error" }
+       109 -            })}\n\n`);
+       110 -            return res.end();
+       111 -          }
+       112 -  
+       113 -          const responseId = `chatcmpl-${generateUUID()}`;
+       114 -          const created = Math.floor(Date.now() / 1000);
+       115 -  
+       116 -          // 发送初始消息
+       117 -          const initialChunk = {
+       118 -            id: responseId,
+       119 -            object: "chat.completion.chunk",
+       120 -            created: created,
+       121 -            model: reqData.model || "gpt-4o",
+       122 -            choices: [{
+       123 -              index: 0,
+       124 -              delta: { role: "assistant" },
+       125 -              finish_reason: null,
+       126 -            }],
+       127 -          };
+       128 -          res.write(`data: 
+           - ${JSON.stringify(initialChunk)}\n\n`);
+       129 -  
+       130 -          const reader = response.body;
+       131 -          let buffer = "";
+       132 -  
+       133 -          reader.on('data', (chunk) => {
+       134 -            buffer += chunk.toString();
+       135 -  
+       136 -            while (buffer.includes("\n")) {
+       137 -              const lineEnd = buffer.indexOf("\n");
+       138 -              const line = buffer.substring(0, lineEnd);
+       139 -              buffer = buffer.substring(lineEnd + 1);
+       140 -  
+       141 -              if (line.startsWith("data: ")) {
+       142 -                const data = line.substring(6).trim();
+       143 -                if (data) {
+       144 -                  try {
+       145 -                    const eventData = JSON.parse(data);
+       146 -                    if (eventData.type === "text") {
+       147 -                      const content = eventData.content || 
+           - "";
+       148 -                      if (content) {
+       149 -                        const chunkData = {
+       150 -                          id: responseId,
+       151 -                          object: "chat.completion.chunk",
+       152 -                          created: created,
+       153 -                          model: reqData.model || "gpt-4o",
+       154 -                          choices: [{
+       155 -                            index: 0,
+       156 -                            delta: { content: content },
+       157 -                            finish_reason: null,
+       158 -                          }],
+       159 -                        };
+       160 -                        res.write(`data: 
+           - ${JSON.stringify(chunkData)}\n\n`);
+       161 -                      }
+       162 -                    }
+       163 -                  } catch {
+       164 -                    // 忽略无效的JSON数据
+       165 -                  }
+       166 -                }
+       167 -              }
+       168 -            }
+       169 -          });
+       170 -  
+       171 -          reader.on('end', () => {
+       172 -            // 发送完成消息
+       173 -            const finalChunk = {
+       174 -              id: responseId,
+       175 -              object: "chat.completion.chunk",
+       176 -              created: created,
+       177 -              model: reqData.model || "gpt-4o",
+       178 -              choices: [{
+       179 -                index: 0,
+       180 -                delta: {},
+       181 -                finish_reason: "stop",
+       182 -              }],
+       183 -            };
+       184 -            res.write(`data: 
+           - ${JSON.stringify(finalChunk)}\n\n`);
+       185 -            res.write("data: [DONE]\n\n");
+       186 -            res.end();
+       187 -          });
+       188 -  
+       189 -          reader.on('error', (error) => {
+       190 -            res.write(`data: ${JSON.stringify({
+       191 -              error: { message: error.message, type: 
+           - "server_error" }
+       192 -            })}\n\n`);
+       193 -            res.end();
+       194 -          });
+       195 -  
+       196 -        } catch (error) {
+       197 -          res.write(`data: ${JSON.stringify({
+       198 -            error: { message: error.message, type: 
+           - "server_error" }
+       199 -          })}\n\n`);
+       200 -          res.end();
+       201 -        }
+       202 -      } else {
+       203 -        // 非流式响应
+       204 -        const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       205 -          method: 'POST',
+       206 -          headers: headers,
+       207 -          body: JSON.stringify(highlightData),
+       208 -        });
+       209 -  
+       210 -        if (!response.ok) {
+       211 -          return res.status(response.status).json({
+       212 -            error: { message: `Highlight API returned status 
+           - code ${response.status}`, type: "api_error" }
+       213 -          });
+       214 -        }
+       215 -  
+       216 -        let fullResponse = "";
+       217 -        const reader = response.body;
+       218 -        let buffer = "";
+       219 -  
+       220 -        return new Promise((resolve, reject) => {
+       221 -          reader.on('data', (chunk) => {
+       222 -            buffer += chunk.toString();
+       223 -  
+       224 -            while (buffer.includes("\n")) {
+       225 -              const lineEnd = buffer.indexOf("\n");
+       226 -              const line = buffer.substring(0, lineEnd);
+       227 -              buffer = buffer.substring(lineEnd + 1);
+       228 -  
+       229 -              if (line.startsWith("data: ")) {
+       230 -                const data = line.substring(6).trim();
+       231 -                if (data) {
+       232 -                  try {
+       233 -                    const eventData = JSON.parse(data);
+       234 -                    if (eventData.type === "text") {
+       235 -                      fullResponse += eventData.content || 
+           - "";
+       236 -                    }
+       237 -                  } catch {
+       238 -                    // 忽略无效的JSON数据
+       239 -                  }
+       240 -                }
+       241 -              }
+       242 -            }
+       243 -          });
+       244 -  
+       245 -          reader.on('end', () => {
+       246 -            const responseId = `chatcmpl-${generateUUID()}`;
+       247 -            const responseData = {
+       248 -              id: responseId,
+       249 -              object: "chat.completion",
+       250 -              created: Math.floor(Date.now() / 1000),
+       251 -              model: reqData.model || "gpt-4o",
+       252 -              choices: [{
+       253 -                index: 0,
+       254 -                message: { role: "assistant", content: 
+           - fullResponse },
+       255 -                finish_reason: "stop",
+       256 -              }],
+       257 -              usage: { prompt_tokens: 0, completion_tokens: 
+           - 0, total_tokens: 0 },
+       258 -            };
+       259 -  
+       260 -            res.status(200).json(responseData);
+       261 -            resolve();
+       262 -          });
+       263 -  
+       264 -          reader.on('error', (error) => {
+       265 -            res.status(500).json({ error: error.message });
+       266 -            reject(error);
+       267 -          });
+       268 -        });
+       269 -      }
+       270 -    } catch (error) {
+       271 -      return res.status(500).json({ error: error.message });
+       272 -    }
+         1 +  // Vercel Node.js Functions - 简化的聊天完成 API
+         2 +  const crypto = require('crypto');
+         3 +  
+         4 +  const HIGHLIGHT_BASE_URL = 
+           + "https://chat-backend.highlightai.com";
+         5 +  const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; 
+           + x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61
+           +  Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
+         6 +  
+         7 +  // Token缓存
+         8 +  const tokenCache = new Map();
+         9 +  
+        10 +  // 工具函数
+        11 +  function base64Decode(str) {
+        12 +    const binaryString = Buffer.from(str, 
+           + 'base64').toString('binary');
+        13 +    const bytes = new Uint8Array(binaryString.length);
+        14 +    for (let i = 0; i < binaryString.length; i++) {
+        15 +      bytes[i] = binaryString.charCodeAt(i);
+        16 +    }
+        17 +    return bytes;
+        18 +  }
+        19 +  
+        20 +  function parseApiKey(apiKeyBase64) {
+        21 +    try {
+        22 +      const decoded = new 
+           + TextDecoder().decode(base64Decode(apiKeyBase64));
+        23 +      return JSON.parse(decoded);
+        24 +    } catch {
+        25 +      return null;
+        26 +    }
+        27 +  }
+        28 +  
+        29 +  function parseJwtPayload(jwtToken) {
+        30 +    try {
+        31 +      const parts = jwtToken.split(".");
+        32 +      if (parts.length !== 3) return null;
+        33 +  
+        34 +      let payload = parts[1];
+        35 +      const padding = payload.length % 4;
+        36 +      if (padding) {
+        37 +        payload += "=".repeat(4 - padding);
+        38 +      }
+        39 +  
+        40 +      const decoded = new 
+           + TextDecoder().decode(base64Decode(payload));
+        41 +      return JSON.parse(decoded);
+        42 +    } catch {
+        43 +      return null;
+        44 +    }
+        45 +  }
+        46 +  
+        47 +  async function refreshAccessToken(rt) {
+        48 +    const tokenResponse = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
+        49 +      method: 'POST',
+        50 +      headers: {
+        51 +        'Content-Type': 'application/json',
+        52 +        'User-Agent': USER_AGENT,
+        53 +      },
+        54 +      body: JSON.stringify({
+        55 +        refreshToken: rt,
+        56 +      }),
+        57 +    });
+        58 +  
+        59 +    if (!tokenResponse.ok) {
+        60 +      throw new Error("Token刷新失败");
+        61 +    }
+        62 +  
+        63 +    const tokenData = await tokenResponse.json();
+        64 +    if (!tokenData.success) {
+        65 +      throw new Error("Token刷新失败");
+        66 +    }
+        67 +  
+        68 +    const newAccessToken = tokenData.data.accessToken;
+        69 +    const payload = parseJwtPayload(newAccessToken);
+        70 +    const expiresAt = payload?.exp || Math.floor(Date.now() /
+           +  1000) + 3600;
+        71 +  
+        72 +    // 更新缓存
+        73 +    tokenCache.set(rt, {
+        74 +      access_token: newAccessToken,
+        75 +      expires_at: expiresAt,
+        76 +    });
+        77 +  
+        78 +    return newAccessToken;
+        79 +  }
+        80 +  
+        81 +  async function getAccessToken(rt) {
+        82 +    const tokenInfo = tokenCache.get(rt);
+        83 +    const currentTime = Math.floor(Date.now() / 1000);
+        84 +  
+        85 +    // 如果token存在且未过期（提前60秒刷新）
+        86 +    if (tokenInfo && tokenInfo.expires_at > currentTime + 60)
+           +  {
+        87 +      return tokenInfo.access_token;
+        88 +    }
+        89 +  
+        90 +    // 刷新token
+        91 +    return await refreshAccessToken(rt);
+        92 +  }
+        93 +  
+        94 +  function generateUUID() {
+        95 +    return 
+           + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+           + function(c) {
+        96 +      const r = Math.random() * 16 | 0;
+        97 +      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        98 +      return v.toString(16);
+        99 +    });
+       100 +  }
+       101 +  
+       102 +  function formatMessagesToPrompt(messages) {
+       103 +    const formattedMessages = [];
+       104 +    for (const message of messages) {
+       105 +      if (message.role) {
+       106 +        if (message.content) {
+       107 +          if (Array.isArray(message.content)) {
+       108 +            for (const item of message.content) {
+       109 +              formattedMessages.push(`${message.role}: 
+           + ${item.text}`);
+       110 +            }
+       111 +          } else {
+       112 +            formattedMessages.push(`${message.role}: 
+           + ${message.content}`);
+       113 +          }
+       114 +        }
+       115 +        if (message.tool_calls) {
+       116 +          formattedMessages.push(`${message.role}: 
+           + ${JSON.stringify(message.tool_calls)}`);
+       117 +        }
+       118 +        if (message.tool_call_id) {
+       119 +          formattedMessages.push(`${message.role}: 
+           + tool_call_id: ${message.tool_call_id} ${message.content}`);
+       120 +        }
+       121 +      }
+       122 +    }
+       123 +    return formattedMessages.join("\n\n");
+       124 +  }
+       125 +  
+       126 +  // 简化版获取模型ID
+       127 +  async function getModelId(accessToken, modelName) {
+       128 +    const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+       129 +      headers: {
+       130 +        'Authorization': `Bearer ${accessToken}`,
+       131 +        'User-Agent': USER_AGENT,
+       132 +      },
+       133 +    });
+       134 +  
+       135 +    if (!response.ok) {
+       136 +      throw new Error("获取模型列表失败");
+       137 +    }
+       138 +  
+       139 +    const respJson = await response.json();
+       140 +    if (!respJson.success) {
+       141 +      throw new Error("获取模型数据失败");
+       142 +    }
+       143 +  
+       144 +    // 找到对应的模型ID
+       145 +    const model = respJson.data.find(m => m.name === 
+           + modelName);
+       146 +    return model ? model.id : respJson.data[0]?.id; // 
+           + 默认返回第一个模型的ID
+       147 +  }
+       148 +  
+       149 +  // 简化版生成identifier（不使用复杂的加密）
+       150 +  function getSimpleIdentifier() {
+       151 +    const randomHex = crypto.randomBytes(12).toString('hex');
+       152 +    const simpleHash = crypto.createHash('md5').update(`${Dat
+           + e.now()}`).digest('hex');
+       153 +    return `${randomHex}:${simpleHash}`;
+       154 +  }
+       155 +  
+       156 +  module.exports = async function handler(req, res) {
+       157 +    // CORS 设置
+       158 +    res.setHeader('Access-Control-Allow-Origin', '*');
+       159 +    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           +  PUT, DELETE, OPTIONS');
+       160 +    res.setHeader('Access-Control-Allow-Headers', 
+           + 'Content-Type, Authorization, X-Requested-With');
+       161 +    res.setHeader('Access-Control-Max-Age', '86400');
+       162 +  
+       163 +    if (req.method === 'OPTIONS') {
+       164 +      return res.status(204).end();
+       165 +    }
+       166 +  
+       167 +    if (req.method !== 'POST') {
+       168 +      return res.status(405).json({ error: 'Method not 
+           + allowed' });
+       169 +    }
+       170 +  
+       171 +    // 获取并验证 Bearer token
+       172 +    const authHeader = req.headers.authorization;
+       173 +    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+       174 +      return res.status(401).json({ error: "Missing 
+           + authorization token" });
+       175 +    }
+       176 +  
+       177 +    const token = authHeader.substring(7);
+       178 +    const userInfo = parseApiKey(token);
+       179 +  
+       180 +    if (!userInfo || !userInfo.rt) {
+       181 +      return res.status(401).json({ error: "Invalid 
+           + authorization token" });
+       182 +    }
+       183 +  
+       184 +    try {
+       185 +      const reqData = req.body;
+       186 +  
+       187 +      if (!userInfo.user_id || !userInfo.client_uuid) {
+       188 +        return res.status(401).json({ error: "Invalid 
+           + authorization token - missing required fields" });
+       189 +      }
+       190 +  
+       191 +      const accessToken = await getAccessToken(userInfo.rt);
+       192 +      const modelId = await getModelId(accessToken, 
+           + reqData.model || "gpt-4o");
+       193 +  
+       194 +      const prompt = 
+           + formatMessagesToPrompt(reqData.messages);
+       195 +      const identifier = getSimpleIdentifier(); // 使用简化版
+       196 +  
+       197 +      const highlightData = {
+       198 +        prompt: prompt,
+       199 +        attachedContext: [],
+       200 +        modelId: modelId,
+       201 +        additionalTools: [],
+       202 +        backendPlugins: [],
+       203 +        useMemory: false,
+       204 +        useKnowledge: false,
+       205 +        ephemeral: false,
+       206 +        timezone: "Asia/Hong_Kong",
+       207 +      };
+       208 +  
+       209 +      const headers = {
+       210 +        "accept": "*/*",
+       211 +        "accept-encoding": "gzip, deflate, br, zstd",
+       212 +        "accept-language": "zh-CN",
+       213 +        "authorization": `Bearer ${accessToken}`,
+       214 +        "content-type": "application/json",
+       215 +        "user-agent": USER_AGENT,
+       216 +        "identifier": identifier
+       217 +      };
+       218 +  
+       219 +      if (reqData.stream) {
+       220 +        // 流式响应处理（简化版）
+       221 +        res.setHeader('Content-Type', 'text/event-stream');
+       222 +        res.setHeader('Cache-Control', 'no-cache');
+       223 +        res.setHeader('Connection', 'keep-alive');
+       224 +  
+       225 +        const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       226 +          method: 'POST',
+       227 +          headers: headers,
+       228 +          body: JSON.stringify(highlightData),
+       229 +        });
+       230 +  
+       231 +        if (!response.ok) {
+       232 +          res.write(`data: ${JSON.stringify({
+       233 +            error: { message: `Highlight API returned status 
+           + code ${response.status}`, type: "api_error" }
+       234 +          })}\n\n`);
+       235 +          return res.end();
+       236 +        }
+       237 +  
+       238 +        const responseId = `chatcmpl-${generateUUID()}`;
+       239 +        const created = Math.floor(Date.now() / 1000);
+       240 +  
+       241 +        // 发送初始消息
+       242 +        const initialChunk = {
+       243 +          id: responseId,
+       244 +          object: "chat.completion.chunk",
+       245 +          created: created,
+       246 +          model: reqData.model || "gpt-4o",
+       247 +          choices: [{
+       248 +            index: 0,
+       249 +            delta: { role: "assistant" },
+       250 +            finish_reason: null,
+       251 +          }],
+       252 +        };
+       253 +        res.write(`data: 
+           + ${JSON.stringify(initialChunk)}\n\n`);
+       254 +  
+       255 +        // 简化的流处理
+       256 +        const reader = response.body;
+       257 +        let buffer = "";
+       258 +  
+       259 +        reader.on('data', (chunk) => {
+       260 +          buffer += chunk.toString();
+       261 +  
+       262 +          while (buffer.includes("\n")) {
+       263 +            const lineEnd = buffer.indexOf("\n");
+       264 +            const line = buffer.substring(0, lineEnd);
+       265 +            buffer = buffer.substring(lineEnd + 1);
+       266 +  
+       267 +            if (line.startsWith("data: ")) {
+       268 +              const data = line.substring(6).trim();
+       269 +              if (data) {
+       270 +                try {
+       271 +                  const eventData = JSON.parse(data);
+       272 +                  if (eventData.type === "text" && 
+           + eventData.content) {
+       273 +                    const chunkData = {
+       274 +                      id: responseId,
+       275 +                      object: "chat.completion.chunk",
+       276 +                      created: created,
+       277 +                      model: reqData.model || "gpt-4o",
+       278 +                      choices: [{
+       279 +                        index: 0,
+       280 +                        delta: { content: eventData.content 
+           + },
+       281 +                        finish_reason: null,
+       282 +                      }],
+       283 +                    };
+       284 +                    res.write(`data: 
+           + ${JSON.stringify(chunkData)}\n\n`);
+       285 +                  }
+       286 +                } catch {
+       287 +                  // 忽略无效JSON
+       288 +                }
+       289 +              }
+       290 +            }
+       291 +          }
+       292 +        });
+       293 +  
+       294 +        reader.on('end', () => {
+       295 +          const finalChunk = {
+       296 +            id: responseId,
+       297 +            object: "chat.completion.chunk",
+       298 +            created: created,
+       299 +            model: reqData.model || "gpt-4o",
+       300 +            choices: [{ index: 0, delta: {}, finish_reason: 
+           + "stop" }],
+       301 +          };
+       302 +          res.write(`data: 
+           + ${JSON.stringify(finalChunk)}\n\n`);
+       303 +          res.write("data: [DONE]\n\n");
+       304 +          res.end();
+       305 +        });
+       306 +  
+       307 +        reader.on('error', (error) => {
+       308 +          res.write(`data: ${JSON.stringify({
+       309 +            error: { message: error.message, type: 
+           + "server_error" }
+       310 +          })}\n\n`);
+       311 +          res.end();
+       312 +        });
+       313 +  
+       314 +      } else {
+       315 +        // 非流式响应
+       316 +        const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       317 +          method: 'POST',
+       318 +          headers: headers,
+       319 +          body: JSON.stringify(highlightData),
+       320 +        });
+       321 +  
+       322 +        if (!response.ok) {
+       323 +          return res.status(response.status).json({
+       324 +            error: { message: `Highlight API returned status 
+           + code ${response.status}`, type: "api_error" }
+       325 +          });
+       326 +        }
+       327 +  
+       328 +        let fullResponse = "";
+       329 +        const reader = response.body;
+       330 +        let buffer = "";
+       331 +  
+       332 +        return new Promise((resolve, reject) => {
+       333 +          reader.on('data', (chunk) => {
+       334 +            buffer += chunk.toString();
+       335 +  
+       336 +            while (buffer.includes("\n")) {
+       337 +              const lineEnd = buffer.indexOf("\n");
+       338 +              const line = buffer.substring(0, lineEnd);
+       339 +              buffer = buffer.substring(lineEnd + 1);
+       340 +  
+       341 +              if (line.startsWith("data: ")) {
+       342 +                const data = line.substring(6).trim();
+       343 +                if (data) {
+       344 +                  try {
+       345 +                    const eventData = JSON.parse(data);
+       346 +                    if (eventData.type === "text") {
+       347 +                      fullResponse += eventData.content || 
+           + "";
+       348 +                    }
+       349 +                  } catch {
+       350 +                    // 忽略无效JSON
+       351 +                  }
+       352 +                }
+       353 +              }
+       354 +            }
+       355 +          });
+       356 +  
+       357 +          reader.on('end', () => {
+       358 +            const responseId = `chatcmpl-${generateUUID()}`;
+       359 +            const responseData = {
+       360 +              id: responseId,
+       361 +              object: "chat.completion",
+       362 +              created: Math.floor(Date.now() / 1000),
+       363 +              model: reqData.model || "gpt-4o",
+       364 +              choices: [{
+       365 +                index: 0,
+       366 +                message: { role: "assistant", content: 
+           + fullResponse },
+       367 +                finish_reason: "stop",
+       368 +              }],
+       369 +              usage: { prompt_tokens: 0, completion_tokens: 
+           + 0, total_tokens: 0 },
+       370 +            };
+       371 +  
+       372 +            res.status(200).json(responseData);
+       373 +            resolve();
+       374 +          });
+       375 +  
+       376 +          reader.on('error', (error) => {
+       377 +            res.status(500).json({ error: error.message });
+       378 +            reject(error);
+       379 +          });
+       380 +        });
+       381 +      }
+       382 +    } catch (error) {
+       383 +      return res.status(500).json({ error: error.message });
+       384 +    }
+       385    };
+       386   \ No newline at end of file
+
+● 现在测试简化版的聊天功能：
+
+● Bash(curl -X POST "https://hhhhhhh2api.vercel.app/v1/chat/completions" \
+        -H "Authorization: Bearer
+      eyJydCI6Imd4OEVJQ0VkU3poVzlSeFFzSUxkcE93aksiLCJ1c2VyX2lkIjoidXNl…)
+  ⎿  A server error has occurred   
+
+     FUNCTION_INVOCATION_FAILED
+     … +11 lines (ctrl+o to expand)
+
+● 看起来还是有问题。让我对比一下deno版本的工作方式。我注意到一个关键差异：id
+  entifier字段。让我先测试一下不带identifier是否工作：
+
+● Write(api\v1\chat\completions.js)
+  ⎿  Updated api\v1\chat\completions.js with 156 additions and 384 removals
+         1 -  // Vercel Node.js Functions - 简化的聊天完成 API
+         2 -  const crypto = require('crypto');
+         3 -  
+         4 -  const HIGHLIGHT_BASE_URL = 
+           -  "https://chat-backend.highlightai.com";
+         5 -  const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; 
+           -  x64) AppleWebKit/537.36 (KHTML, like Gecko) 
+           -  Highlight/1.3.61 Chrome/132.0.6834.210 Electron/34.5.8 
+           -  Safari/537.36";
+         6 -  
+         7 -  // Token缓存
+         8 -  const tokenCache = new Map();
+         9 -  
+        10 -  // 工具函数
+        11 -  function base64Decode(str) {
+        12 -    const binaryString = Buffer.from(str, 
+           - 'base64').toString('binary');
+        13 -    const bytes = new Uint8Array(binaryString.length);
+        14 -    for (let i = 0; i < binaryString.length; i++) {
+        15 -      bytes[i] = binaryString.charCodeAt(i);
+        16 -    }
+        17 -    return bytes;
+        18 -  }
+        19 -  
+        20 -  function parseApiKey(apiKeyBase64) {
+        21 -    try {
+        22 -      const decoded = new 
+           - TextDecoder().decode(base64Decode(apiKeyBase64));
+        23 -      return JSON.parse(decoded);
+        24 -    } catch {
+        25 -      return null;
+        26 -    }
+        27 -  }
+        28 -  
+        29 -  function parseJwtPayload(jwtToken) {
+        30 -    try {
+        31 -      const parts = jwtToken.split(".");
+        32 -      if (parts.length !== 3) return null;
+        33 -  
+        34 -      let payload = parts[1];
+        35 -      const padding = payload.length % 4;
+        36 -      if (padding) {
+        37 -        payload += "=".repeat(4 - padding);
+        38 -      }
+        39 -  
+        40 -      const decoded = new 
+           - TextDecoder().decode(base64Decode(payload));
+        41 -      return JSON.parse(decoded);
+        42 -    } catch {
+        43 -      return null;
+        44 -    }
+        45 -  }
+        46 -  
+        47 -  async function refreshAccessToken(rt) {
+        48 -    const tokenResponse = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
+        49 -      method: 'POST',
+        50 -      headers: {
+        51 -        'Content-Type': 'application/json',
+        52 -        'User-Agent': USER_AGENT,
+        53 -      },
+        54 -      body: JSON.stringify({
+        55 -        refreshToken: rt,
+        56 -      }),
+        57 -    });
+        58 -  
+        59 -    if (!tokenResponse.ok) {
+        60 -      throw new Error("Token刷新失败");
+        61 -    }
+        62 -  
+        63 -    const tokenData = await tokenResponse.json();
+        64 -    if (!tokenData.success) {
+        65 -      throw new Error("Token刷新失败");
+        66 -    }
+        67 -  
+        68 -    const newAccessToken = tokenData.data.accessToken;
+        69 -    const payload = parseJwtPayload(newAccessToken);
+        70 -    const expiresAt = payload?.exp || Math.floor(Date.now() /
+           -  1000) + 3600;
+        71 -  
+        72 -    // 更新缓存
+        73 -    tokenCache.set(rt, {
+        74 -      access_token: newAccessToken,
+        75 -      expires_at: expiresAt,
+        76 -    });
+        77 -  
+        78 -    return newAccessToken;
+        79 -  }
+        80 -  
+        81 -  async function getAccessToken(rt) {
+        82 -    const tokenInfo = tokenCache.get(rt);
+        83 -    const currentTime = Math.floor(Date.now() / 1000);
+        84 -  
+        85 -    // 如果token存在且未过期（提前60秒刷新）
+        86 -    if (tokenInfo && tokenInfo.expires_at > currentTime + 60)
+           -  {
+        87 -      return tokenInfo.access_token;
+        88 -    }
+        89 -  
+        90 -    // 刷新token
+        91 -    return await refreshAccessToken(rt);
+        92 -  }
+        93 -  
+        94 -  function generateUUID() {
+        95 -    return 
+           - 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+           - function(c) {
+        96 -      const r = Math.random() * 16 | 0;
+        97 -      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+        98 -      return v.toString(16);
+        99 -    });
+       100 -  }
+       101 -  
+       102 -  function formatMessagesToPrompt(messages) {
+       103 -    const formattedMessages = [];
+       104 -    for (const message of messages) {
+       105 -      if (message.role) {
+       106 -        if (message.content) {
+       107 -          if (Array.isArray(message.content)) {
+       108 -            for (const item of message.content) {
+       109 -              formattedMessages.push(`${message.role}: 
+           - ${item.text}`);
+       110 -            }
+       111 -          } else {
+       112 -            formattedMessages.push(`${message.role}: 
+           - ${message.content}`);
+       113 -          }
+       114 -        }
+       115 -        if (message.tool_calls) {
+       116 -          formattedMessages.push(`${message.role}: 
+           - ${JSON.stringify(message.tool_calls)}`);
+       117 -        }
+       118 -        if (message.tool_call_id) {
+       119 -          formattedMessages.push(`${message.role}: 
+           - tool_call_id: ${message.tool_call_id} ${message.content}`);
+       120 -        }
+       121 -      }
+       122 -    }
+       123 -    return formattedMessages.join("\n\n");
+       124 -  }
+       125 -  
+       126 -  // 简化版获取模型ID
+       127 -  async function getModelId(accessToken, modelName) {
+       128 -    const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+       129 -      headers: {
+       130 -        'Authorization': `Bearer ${accessToken}`,
+       131 -        'User-Agent': USER_AGENT,
+       132 -      },
+       133 -    });
+       134 -  
+       135 -    if (!response.ok) {
+       136 -      throw new Error("获取模型列表失败");
+       137 -    }
+       138 -  
+       139 -    const respJson = await response.json();
+       140 -    if (!respJson.success) {
+       141 -      throw new Error("获取模型数据失败");
+       142 -    }
+       143 -  
+       144 -    // 找到对应的模型ID
+       145 -    const model = respJson.data.find(m => m.name === 
+           - modelName);
+       146 -    return model ? model.id : respJson.data[0]?.id; // 
+           - 默认返回第一个模型的ID
+       147 -  }
+       148 -  
+       149 -  // 简化版生成identifier（不使用复杂的加密）
+       150 -  function getSimpleIdentifier() {
+       151 -    const randomHex = crypto.randomBytes(12).toString('hex');
+       152 -    const simpleHash = crypto.createHash('md5').update(`${Dat
+           - e.now()}`).digest('hex');
+       153 -    return `${randomHex}:${simpleHash}`;
+       154 -  }
+       155 -  
+       156 -  module.exports = async function handler(req, res) {
+       157 -    // CORS 设置
+       158 -    res.setHeader('Access-Control-Allow-Origin', '*');
+       159 -    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           -  PUT, DELETE, OPTIONS');
+       160 -    res.setHeader('Access-Control-Allow-Headers', 
+           - 'Content-Type, Authorization, X-Requested-With');
+       161 -    res.setHeader('Access-Control-Max-Age', '86400');
+       162 -  
+       163 -    if (req.method === 'OPTIONS') {
+       164 -      return res.status(204).end();
+       165 -    }
+       166 -  
+       167 -    if (req.method !== 'POST') {
+       168 -      return res.status(405).json({ error: 'Method not 
+           - allowed' });
+       169 -    }
+       170 -  
+       171 -    // 获取并验证 Bearer token
+       172 -    const authHeader = req.headers.authorization;
+       173 -    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+       174 -      return res.status(401).json({ error: "Missing 
+           - authorization token" });
+       175 -    }
+       176 -  
+       177 -    const token = authHeader.substring(7);
+       178 -    const userInfo = parseApiKey(token);
+       179 -  
+       180 -    if (!userInfo || !userInfo.rt) {
+       181 -      return res.status(401).json({ error: "Invalid 
+           - authorization token" });
+       182 -    }
+       183 -  
+       184 -    try {
+       185 -      const reqData = req.body;
+       186 -  
+       187 -      if (!userInfo.user_id || !userInfo.client_uuid) {
+       188 -        return res.status(401).json({ error: "Invalid 
+           - authorization token - missing required fields" });
+       189 -      }
+       190 -  
+       191 -      const accessToken = await getAccessToken(userInfo.rt);
+       192 -      const modelId = await getModelId(accessToken, 
+           - reqData.model || "gpt-4o");
+       193 -  
+       194 -      const prompt = 
+           - formatMessagesToPrompt(reqData.messages);
+       195 -      const identifier = getSimpleIdentifier(); // 使用简化版
+       196 -  
+       197 -      const highlightData = {
+       198 -        prompt: prompt,
+       199 -        attachedContext: [],
+       200 -        modelId: modelId,
+       201 -        additionalTools: [],
+       202 -        backendPlugins: [],
+       203 -        useMemory: false,
+       204 -        useKnowledge: false,
+       205 -        ephemeral: false,
+       206 -        timezone: "Asia/Hong_Kong",
+       207 -      };
+       208 -  
+       209 -      const headers = {
+       210 -        "accept": "*/*",
+       211 -        "accept-encoding": "gzip, deflate, br, zstd",
+       212 -        "accept-language": "zh-CN",
+       213 -        "authorization": `Bearer ${accessToken}`,
+       214 -        "content-type": "application/json",
+       215 -        "user-agent": USER_AGENT,
+       216 -        "identifier": identifier
+       217 -      };
+       218 -  
+       219 -      if (reqData.stream) {
+       220 -        // 流式响应处理（简化版）
+       221 -        res.setHeader('Content-Type', 'text/event-stream');
+       222 -        res.setHeader('Cache-Control', 'no-cache');
+       223 -        res.setHeader('Connection', 'keep-alive');
+       224 -  
+       225 -        const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       226 -          method: 'POST',
+       227 -          headers: headers,
+       228 -          body: JSON.stringify(highlightData),
+       229 -        });
+       230 -  
+       231 -        if (!response.ok) {
+       232 -          res.write(`data: ${JSON.stringify({
+       233 -            error: { message: `Highlight API returned status 
+           - code ${response.status}`, type: "api_error" }
+       234 -          })}\n\n`);
+       235 -          return res.end();
+       236 -        }
+       237 -  
+       238 -        const responseId = `chatcmpl-${generateUUID()}`;
+       239 -        const created = Math.floor(Date.now() / 1000);
+       240 -  
+       241 -        // 发送初始消息
+       242 -        const initialChunk = {
+       243 -          id: responseId,
+       244 -          object: "chat.completion.chunk",
+       245 -          created: created,
+       246 -          model: reqData.model || "gpt-4o",
+       247 -          choices: [{
+       248 -            index: 0,
+       249 -            delta: { role: "assistant" },
+       250 -            finish_reason: null,
+       251 -          }],
+       252 -        };
+       253 -        res.write(`data: 
+           - ${JSON.stringify(initialChunk)}\n\n`);
+       254 -  
+       255 -        // 简化的流处理
+       256 -        const reader = response.body;
+       257 -        let buffer = "";
+       258 -  
+       259 -        reader.on('data', (chunk) => {
+       260 -          buffer += chunk.toString();
+       261 -  
+       262 -          while (buffer.includes("\n")) {
+       263 -            const lineEnd = buffer.indexOf("\n");
+       264 -            const line = buffer.substring(0, lineEnd);
+       265 -            buffer = buffer.substring(lineEnd + 1);
+       266 -  
+       267 -            if (line.startsWith("data: ")) {
+       268 -              const data = line.substring(6).trim();
+       269 -              if (data) {
+       270 -                try {
+       271 -                  const eventData = JSON.parse(data);
+       272 -                  if (eventData.type === "text" && 
+           - eventData.content) {
+       273 -                    const chunkData = {
+       274 -                      id: responseId,
+       275 -                      object: "chat.completion.chunk",
+       276 -                      created: created,
+       277 -                      model: reqData.model || "gpt-4o",
+       278 -                      choices: [{
+       279 -                        index: 0,
+       280 -                        delta: { content: eventData.content 
+           - },
+       281 -                        finish_reason: null,
+       282 -                      }],
+       283 -                    };
+       284 -                    res.write(`data: 
+           - ${JSON.stringify(chunkData)}\n\n`);
+       285 -                  }
+       286 -                } catch {
+       287 -                  // 忽略无效JSON
+       288 -                }
+       289 -              }
+       290 -            }
+       291 -          }
+       292 -        });
+       293 -  
+       294 -        reader.on('end', () => {
+       295 -          const finalChunk = {
+       296 -            id: responseId,
+       297 -            object: "chat.completion.chunk",
+       298 -            created: created,
+       299 -            model: reqData.model || "gpt-4o",
+       300 -            choices: [{ index: 0, delta: {}, finish_reason: 
+           - "stop" }],
+       301 -          };
+       302 -          res.write(`data: 
+           - ${JSON.stringify(finalChunk)}\n\n`);
+       303 -          res.write("data: [DONE]\n\n");
+       304 -          res.end();
+       305 -        });
+       306 -  
+       307 -        reader.on('error', (error) => {
+       308 -          res.write(`data: ${JSON.stringify({
+       309 -            error: { message: error.message, type: 
+           - "server_error" }
+       310 -          })}\n\n`);
+       311 -          res.end();
+       312 -        });
+       313 -  
+       314 -      } else {
+       315 -        // 非流式响应
+       316 -        const response = await 
+           - fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       317 -          method: 'POST',
+       318 -          headers: headers,
+       319 -          body: JSON.stringify(highlightData),
+       320 -        });
+       321 -  
+       322 -        if (!response.ok) {
+       323 -          return res.status(response.status).json({
+       324 -            error: { message: `Highlight API returned status 
+           - code ${response.status}`, type: "api_error" }
+       325 -          });
+       326 -        }
+       327 -  
+       328 -        let fullResponse = "";
+       329 -        const reader = response.body;
+       330 -        let buffer = "";
+       331 -  
+       332 -        return new Promise((resolve, reject) => {
+       333 -          reader.on('data', (chunk) => {
+       334 -            buffer += chunk.toString();
+       335 -  
+       336 -            while (buffer.includes("\n")) {
+       337 -              const lineEnd = buffer.indexOf("\n");
+       338 -              const line = buffer.substring(0, lineEnd);
+       339 -              buffer = buffer.substring(lineEnd + 1);
+       340 -  
+       341 -              if (line.startsWith("data: ")) {
+       342 -                const data = line.substring(6).trim();
+       343 -                if (data) {
+       344 -                  try {
+       345 -                    const eventData = JSON.parse(data);
+       346 -                    if (eventData.type === "text") {
+       347 -                      fullResponse += eventData.content || 
+           - "";
+       348 -                    }
+       349 -                  } catch {
+       350 -                    // 忽略无效JSON
+       351 -                  }
+       352 -                }
+       353 -              }
+       354 -            }
+       355 -          });
+       356 -  
+       357 -          reader.on('end', () => {
+       358 -            const responseId = `chatcmpl-${generateUUID()}`;
+       359 -            const responseData = {
+       360 -              id: responseId,
+       361 -              object: "chat.completion",
+       362 -              created: Math.floor(Date.now() / 1000),
+       363 -              model: reqData.model || "gpt-4o",
+       364 -              choices: [{
+       365 -                index: 0,
+       366 -                message: { role: "assistant", content: 
+           - fullResponse },
+       367 -                finish_reason: "stop",
+       368 -              }],
+       369 -              usage: { prompt_tokens: 0, completion_tokens: 
+           - 0, total_tokens: 0 },
+       370 -            };
+       371 -  
+       372 -            res.status(200).json(responseData);
+       373 -            resolve();
+       374 -          });
+       375 -  
+       376 -          reader.on('error', (error) => {
+       377 -            res.status(500).json({ error: error.message });
+       378 -            reject(error);
+       379 -          });
+       380 -        });
+       381 -      }
+       382 -    } catch (error) {
+       383 -      return res.status(500).json({ error: error.message });
+       384 -    }
+         1 +  // Vercel Node.js Functions - 最简化测试版聊天完成 API
+         2 +  const crypto = require('crypto');
+         3 +  
+         4 +  const HIGHLIGHT_BASE_URL = 
+           +  "https://chat-backend.highlightai.com";
+         5 +  const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; 
+           +  x64) AppleWebKit/537.36 (KHTML, like Gecko) 
+           +  Highlight/1.3.61 Chrome/132.0.6834.210 Electron/34.5.8 
+           +  Safari/537.36";
+         6 +  
+         7 +  function base64Decode(str) {
+         8 +    const binaryString = Buffer.from(str, 
+           + 'base64').toString('binary');
+         9 +    const bytes = new Uint8Array(binaryString.length);
+        10 +    for (let i = 0; i < binaryString.length; i++) {
+        11 +      bytes[i] = binaryString.charCodeAt(i);
+        12 +    }
+        13 +    return bytes;
+        14 +  }
+        15 +  
+        16 +  function parseApiKey(apiKeyBase64) {
+        17 +    try {
+        18 +      const decoded = new 
+           + TextDecoder().decode(base64Decode(apiKeyBase64));
+        19 +      return JSON.parse(decoded);
+        20 +    } catch {
+        21 +      return null;
+        22 +    }
+        23 +  }
+        24 +  
+        25 +  async function refreshAccessToken(rt) {
+        26 +    const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
+        27 +      method: 'POST',
+        28 +      headers: {
+        29 +        'Content-Type': 'application/json',
+        30 +        'User-Agent': USER_AGENT,
+        31 +      },
+        32 +      body: JSON.stringify({ refreshToken: rt }),
+        33 +    });
+        34 +  
+        35 +    if (!response.ok) {
+        36 +      throw new Error("Token refresh failed");
+        37 +    }
+        38 +  
+        39 +    const data = await response.json();
+        40 +    if (!data.success) {
+        41 +      throw new Error("Token refresh failed");
+        42 +    }
+        43 +  
+        44 +    return data.data.accessToken;
+        45 +  }
+        46 +  
+        47 +  module.exports = async function handler(req, res) {
+        48 +    // CORS 设置
+        49 +    res.setHeader('Access-Control-Allow-Origin', '*');
+        50 +    res.setHeader('Access-Control-Allow-Methods', 'GET, POST,
+           +  PUT, DELETE, OPTIONS');
+        51 +    res.setHeader('Access-Control-Allow-Headers', 
+           + 'Content-Type, Authorization, X-Requested-With');
+        52 +    res.setHeader('Access-Control-Max-Age', '86400');
+        53 +  
+        54 +    if (req.method === 'OPTIONS') {
+        55 +      return res.status(204).end();
+        56 +    }
+        57 +  
+        58 +    if (req.method !== 'POST') {
+        59 +      return res.status(405).json({ error: 'Method not 
+           + allowed' });
+        60 +    }
+        61 +  
+        62 +    try {
+        63 +      // 验证token
+        64 +      const authHeader = req.headers.authorization;
+        65 +      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        66 +        return res.status(401).json({ error: "Missing 
+           + authorization token" });
+        67 +      }
+        68 +  
+        69 +      const token = authHeader.substring(7);
+        70 +      const userInfo = parseApiKey(token);
+        71 +  
+        72 +      if (!userInfo || !userInfo.rt) {
+        73 +        return res.status(401).json({ error: "Invalid 
+           + authorization token" });
+        74 +      }
+        75 +  
+        76 +      // 获取access token
+        77 +      const accessToken = await 
+           + refreshAccessToken(userInfo.rt);
+        78 +  
+        79 +      // 获取模型列表来找到默认模型ID
+        80 +      const modelsResponse = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
+        81 +        headers: {
+        82 +          'Authorization': `Bearer ${accessToken}`,
+        83 +          'User-Agent': USER_AGENT,
+        84 +        },
+        85 +      });
+        86 +  
+        87 +      if (!modelsResponse.ok) {
+        88 +        throw new Error("Failed to get models");
+        89 +      }
+        90 +  
+        91 +      const modelsData = await modelsResponse.json();
+        92 +      const defaultModelId = modelsData.data[0]?.id;
+        93 +  
+        94 +      // 格式化消息
+        95 +      const reqData = req.body;
+        96 +      let prompt = "";
+        97 +      for (const message of reqData.messages) {
+        98 +        if (message.content) {
+        99 +          prompt += `${message.role}: 
+           + ${message.content}\n\n`;
+       100 +        }
+       101 +      }
+       102 +  
+       103 +      // 构建请求数据
+       104 +      const highlightData = {
+       105 +        prompt: prompt.trim(),
+       106 +        attachedContext: [],
+       107 +        modelId: defaultModelId,
+       108 +        additionalTools: [],
+       109 +        backendPlugins: [],
+       110 +        useMemory: false,
+       111 +        useKnowledge: false,
+       112 +        ephemeral: false,
+       113 +        timezone: "Asia/Hong_Kong",
+       114 +      };
+       115 +  
+       116 +      // 不带identifier先测试
+       117 +      const headers = {
+       118 +        "accept": "*/*",
+       119 +        "authorization": `Bearer ${accessToken}`,
+       120 +        "content-type": "application/json",
+       121 +        "user-agent": USER_AGENT,
+       122 +      };
+       123 +  
+       124 +      const response = await 
+           + fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+       125 +        method: 'POST',
+       126 +        headers: headers,
+       127 +        body: JSON.stringify(highlightData),
+       128 +      });
+       129 +  
+       130 +      if (!response.ok) {
+       131 +        return res.status(500).json({
+       132 +          error: `Highlight API returned status 
+           + ${response.status}`,
+       133 +          details: await response.text()
+       134 +        });
+       135 +      }
+       136 +  
+       137 +      // 简单返回成功信息
+       138 +      return res.status(200).json({
+       139 +        id: `chatcmpl-${Date.now()}`,
+       140 +        object: "chat.completion",
+       141 +        created: Math.floor(Date.now() / 1000),
+       142 +        model: reqData.model || "gpt-4o",
+       143 +        choices: [{
+       144 +          index: 0,
+       145 +          message: { role: "assistant", content: "API 
+           + connection successful - processing response..." },
+       146 +          finish_reason: "stop",
+       147 +        }],
+       148 +        usage: { prompt_tokens: 0, completion_tokens: 0, 
+           + total_tokens: 0 },
+       149 +      });
+       150 +  
+       151 +    } catch (error) {
+       152 +      return res.status(500).json({
+       153 +        error: error.message,
+       154 +        stack: process.env.NODE_ENV === 'development' ? 
+           + error.stack : undefined
+       155 +      });
+       156 +    }
+       157    };
+       158   \ No newline at end of file
+  ⎿ API Error: 402 {"type":"invalid_request_error","error":{"type":"invalid_re
+    quest_error","message":"Insufficient points. Required: 2, Available: 0. 
+    Free users cannot reset points. Please upgrade your plan."}}
+

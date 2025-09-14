@@ -1,4 +1,16 @@
 {
+  "name": "hilight2api",
+  "functions": {
+    "api/v1/models.js": {
+      "maxDuration": 30
+    },
+    "api/v1/chat/completions.js": {
+      "maxDuration": 60
+    },
+    "api/login.js": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/v1/models",

@@ -1,14 +1,6 @@
 // Vercel Node.js Functions - 登录端点
-
-const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
-
-function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}
+const { HIGHLIGHT_BASE_URL } = require('../lib/auth');
+const { handleCors, generateUUID } = require('../lib/utils');
 
 async function login(code) {
   console.log("开始登录流程...");
@@ -108,16 +100,10 @@ async function login(code) {
   return userInfo;
 }
 
-export default async function handler(req, res) {
-  // CORS 设置
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Max-Age', '86400');
-  
-  // CORS 预检请求
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+module.exports = async function handler(req, res) {
+  // 处理 CORS
+  if (handleCors(req, res)) {
+    return; // OPTIONS 请求已处理
   }
 
   // 只处理 POST 请求
@@ -137,4 +123,4 @@ export default async function handler(req, res) {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-}
+};
