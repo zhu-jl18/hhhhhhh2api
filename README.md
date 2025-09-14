@@ -2,13 +2,17 @@
 
 将 Highlight AI 接口转换为 OpenAI 兼容格式的代理服务。
 
-## 部署
+## 手动部署
 
 ### Vercel (推荐)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/zhu-jl18/hhhhhhh2api)
+1. 访问 [vercel.com](https://vercel.com)
+2. 导入此 GitHub 仓库
+3. 直接部署（零配置）
 
 ### Deno Deploy (备选)
-[![Deploy to Deno Deploy](https://deno.com/deno-deploy-button.svg)](https://dash.deno.com/new?url=https://github.com/zhu-jl18/hhhhhhh2api&env=)
+1. 访问 [dash.deno.com](https://dash.deno.com)
+2. New Project → GitHub 导入
+3. 入口文件设为 `deno.ts`
 
 ## 使用
 
