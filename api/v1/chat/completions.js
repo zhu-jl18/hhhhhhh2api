@@ -1,60 +1,40 @@
-// Vercel Node.js Functions - 最简化测试版聊天完成 API
-const crypto = require('crypto');
+// Vercel Node.js Functions - 聊天完成 API
+const { HIGHLIGHT_BASE_URL, USER_AGENT, parseApiKey, getAccessToken, getHighlightHeaders } = require('../../lib/auth');
+const { handleCors, formatMessagesToPrompt, formatOpenAITools, generateUUID } = require('../../lib/utils');
+const { getIdentifier } = require('../../lib/crypto');
 
-const HIGHLIGHT_BASE_URL = "https://chat-backend.highlightai.com";
-const USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Highlight/1.3.61 Chrome/132.0.6834.210 Electron/34.5.8 Safari/537.36";
-
-function base64Decode(str) {
-  const binaryString = Buffer.from(str, 'base64').toString('binary');
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-  return bytes;
-}
-
-function parseApiKey(apiKeyBase64) {
-  try {
-    const decoded = new TextDecoder().decode(base64Decode(apiKeyBase64));
-    return JSON.parse(decoded);
-  } catch {
-    return null;
-  }
-}
-
-async function refreshAccessToken(rt) {
-  const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
-    method: 'POST',
+async function getModels(accessToken) {
+  const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
     headers: {
-      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
       'User-Agent': USER_AGENT,
     },
-    body: JSON.stringify({ refreshToken: rt }),
   });
 
   if (!response.ok) {
-    throw new Error("Token refresh failed");
+    throw new Error("Failed to get models");
   }
 
-  const data = await response.json();
-  if (!data.success) {
-    throw new Error("Token refresh failed");
+  const respJson = await response.json();
+  if (!respJson.success) {
+    throw new Error("Failed to get models data");
   }
 
-  return data.data.accessToken;
+  const models = new Map();
+  for (const model of respJson.data) {
+    models.set(model.name, model);
+  }
+
+  return models;
 }
 
 module.exports = async function handler(req, res) {
-  // CORS 设置
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Max-Age', '86400');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
+  // 处理 CORS
+  if (handleCors(req, res)) {
+    return; // OPTIONS 请求已处理
   }
 
+  // 只处理 POST 请求
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -73,39 +53,28 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: "Invalid authorization token" });
     }
 
-    // 获取access token
-    const accessToken = await refreshAccessToken(userInfo.rt);
-
-    // 获取模型列表来找到默认模型ID
-    const modelsResponse = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/models`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'User-Agent': USER_AGENT,
-      },
-    });
-
-    if (!modelsResponse.ok) {
-      throw new Error("Failed to get models");
+    if (!userInfo.user_id || !userInfo.client_uuid) {
+      return res.status(401).json({ error: "Invalid authorization token - missing required fields" });
     }
 
-    const modelsData = await modelsResponse.json();
-    const defaultModelId = modelsData.data[0]?.id;
-
-    // 格式化消息
     const reqData = req.body;
-    let prompt = "";
-    for (const message of reqData.messages) {
-      if (message.content) {
-        prompt += `${message.role}: ${message.content}\n\n`;
-      }
+    const accessToken = await getAccessToken(userInfo.rt);
+    const models = await getModels(accessToken);
+    const modelInfo = models.get(reqData.model || "gpt-4o");
+
+    if (!modelInfo) {
+      return res.status(400).json({ error: `Model '${reqData.model || "gpt-4o"}' not found` });
     }
 
-    // 构建请求数据
+    const prompt = formatMessagesToPrompt(reqData.messages);
+    const tools = formatOpenAITools(reqData.tools);
+    const identifier = await getIdentifier(userInfo.user_id, userInfo.client_uuid);
+
     const highlightData = {
-      prompt: prompt.trim(),
+      prompt: prompt,
       attachedContext: [],
-      modelId: defaultModelId,
-      additionalTools: [],
+      modelId: modelInfo.id,
+      additionalTools: tools,
       backendPlugins: [],
       useMemory: false,
       useKnowledge: false,
@@ -113,40 +82,178 @@ module.exports = async function handler(req, res) {
       timezone: "Asia/Hong_Kong",
     };
 
-    // 不带identifier先测试
-    const headers = {
-      "accept": "*/*",
-      "authorization": `Bearer ${accessToken}`,
-      "content-type": "application/json",
-      "user-agent": USER_AGENT,
-    };
+    const headers = getHighlightHeaders(accessToken, identifier);
 
-    const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(highlightData),
-    });
+    if (reqData.stream) {
+      // 流式响应 - 设置SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
 
-    if (!response.ok) {
-      return res.status(500).json({
-        error: `Highlight API returned status ${response.status}`,
-        details: await response.text()
+      try {
+        const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(highlightData),
+        });
+
+        if (!response.ok) {
+          res.write(`data: ${JSON.stringify({
+            error: { message: `Highlight API returned status code ${response.status}`, type: "api_error" }
+          })}\n\n`);
+          return res.end();
+        }
+
+        const responseId = `chatcmpl-${generateUUID()}`;
+        const created = Math.floor(Date.now() / 1000);
+
+        // 发送初始消息
+        const initialChunk = {
+          id: responseId,
+          object: "chat.completion.chunk",
+          created: created,
+          model: reqData.model || "gpt-4o",
+          choices: [{
+            index: 0,
+            delta: { role: "assistant" },
+            finish_reason: null,
+          }],
+        };
+        res.write(`data: ${JSON.stringify(initialChunk)}\n\n`);
+
+        // 处理流式响应
+        const reader = response.body.getReader();
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += new TextDecoder().decode(value);
+
+          while (buffer.includes("\n")) {
+            const lineEnd = buffer.indexOf("\n");
+            const line = buffer.substring(0, lineEnd);
+            buffer = buffer.substring(lineEnd + 1);
+
+            if (line.startsWith("data: ")) {
+              const data = line.substring(6).trim();
+              if (data) {
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.type === "content" && parsed.content) {
+                    const chunk = {
+                      id: responseId,
+                      object: "chat.completion.chunk",
+                      created: created,
+                      model: reqData.model || "gpt-4o",
+                      choices: [{
+                        index: 0,
+                        delta: { content: parsed.content },
+                        finish_reason: null,
+                      }],
+                    };
+                    res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+                  } else if (parsed.type === "end") {
+                    const finalChunk = {
+                      id: responseId,
+                      object: "chat.completion.chunk",
+                      created: created,
+                      model: reqData.model || "gpt-4o",
+                      choices: [{
+                        index: 0,
+                        delta: {},
+                        finish_reason: "stop",
+                      }],
+                    };
+                    res.write(`data: ${JSON.stringify(finalChunk)}\n\n`);
+                    res.write("data: [DONE]\n\n");
+                    return res.end();
+                  }
+                } catch (e) {
+                  // 忽略解析错误
+                }
+              }
+            }
+          }
+        }
+
+        res.write("data: [DONE]\n\n");
+        return res.end();
+
+      } catch (error) {
+        res.write(`data: ${JSON.stringify({
+          error: { message: error.message, type: "api_error" }
+        })}\n\n`);
+        return res.end();
+      }
+
+    } else {
+      // 非流式响应
+      const response = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/chat`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(highlightData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return res.status(response.status).json({
+          error: `Highlight API error: ${response.status} - ${errorText}`
+        });
+      }
+
+      // 收集完整响应
+      let fullContent = "";
+      const reader = response.body.getReader();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += new TextDecoder().decode(value);
+
+        while (buffer.includes("\n")) {
+          const lineEnd = buffer.indexOf("\n");
+          const line = buffer.substring(0, lineEnd);
+          buffer = buffer.substring(lineEnd + 1);
+
+          if (line.startsWith("data: ")) {
+            const data = line.substring(6).trim();
+            if (data) {
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.type === "content" && parsed.content) {
+                  fullContent += parsed.content;
+                }
+              } catch (e) {
+                // 忽略解析错误
+              }
+            }
+          }
+        }
+      }
+
+      return res.status(200).json({
+        id: `chatcmpl-${generateUUID()}`,
+        object: "chat.completion",
+        created: Math.floor(Date.now() / 1000),
+        model: reqData.model || "gpt-4o",
+        choices: [{
+          index: 0,
+          message: { role: "assistant", content: fullContent },
+          finish_reason: "stop",
+        }],
+        usage: {
+          prompt_tokens: prompt.length,
+          completion_tokens: fullContent.length,
+          total_tokens: prompt.length + fullContent.length,
+        },
       });
     }
-
-    // 简单返回成功信息
-    return res.status(200).json({
-      id: `chatcmpl-${Date.now()}`,
-      object: "chat.completion",
-      created: Math.floor(Date.now() / 1000),
-      model: reqData.model || "gpt-4o",
-      choices: [{
-        index: 0,
-        message: { role: "assistant", content: "API connection successful - processing response..." },
-        finish_reason: "stop",
-      }],
-      usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-    });
 
   } catch (error) {
     return res.status(500).json({
