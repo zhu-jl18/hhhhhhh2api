@@ -35,7 +35,7 @@ async function fetchModelsFromUpstream(accessToken) {
 
 async function getAccessToken(userInfo) {
   // 刷新 access token
-  const tokenResponse = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/token/refresh`, {
+  const tokenResponse = await fetch(`${HIGHLIGHT_BASE_URL}/api/v1/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -43,7 +43,6 @@ async function getAccessToken(userInfo) {
     },
     body: JSON.stringify({
       refreshToken: userInfo.rt,
-      clientUuid: userInfo.client_uuid,
     }),
   });
 
