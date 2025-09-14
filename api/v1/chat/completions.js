@@ -192,15 +192,16 @@ async function kh(n, fixedIv) {
   return `${tHex}:${encryptedHex}`;
 }
 
-function H7t(t = 12) {
-  const crypto = require('crypto');
+async function H7t(t = 12) {
+  const crypto = await import('crypto');
   const randomBytes = crypto.randomBytes(t);
   return Array.from(randomBytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 async function getIdentifier(userId, clientUUID, fixedIv) {
   const t = await kh({ userId, clientUUID }, fixedIv);
-  return `${H7t()}:${t}`;
+  const randomHex = await H7t();
+  return `${randomHex}:${t}`;
 }
 
 function getHighlightHeaders(accessToken, identifier) {
