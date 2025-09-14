@@ -1,4 +1,6 @@
-// Vercel Node.js Functions - 聊天完成 API (处理token刷新失败)
+// Vercel Node.js Functions - 聊天完成 API (修复token刷新)
+const { parseApiKey, getAccessToken } = require('../../lib/auth');
+
 module.exports = async function handler(req, res) {
   // CORS 设置
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,16 +24,7 @@ module.exports = async function handler(req, res) {
     }
 
     const token = authHeader.substring(7);
-
-    // 简单解析API key
-    let userInfo;
-    try {
-      const decoded = Buffer.from(token, 'base64').toString('utf8')
-        .replace(/[\u0000-\u001f\u007f-\u009f]/g, ''); // 清理控制字符
-      userInfo = JSON.parse(decoded);
-    } catch {
-      return res.status(401).json({ error: "Invalid authorization token" });
-    }
+    const userInfo = parseApiKey(token);
 
     if (!userInfo || !userInfo.rt) {
       return res.status(401).json({ error: "Invalid authorization token" });
@@ -41,16 +34,37 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: "Invalid authorization token - missing required fields" });
     }
 
-    // 由于refresh token可能已过期，直接返回提示信息
-    return res.status(402).json({
-      error: "Token刷新失败 - 请提供有效的API Key",
-      details: "当前token可以正确解析但refresh token可能已过期",
-      user_info: {
-        user_id: userInfo.user_id,
-        email: userInfo.email,
-        client_uuid: userInfo.client_uuid
-      }
-    });
+    // 测试token刷新
+    try {
+      const accessToken = await getAccessToken(userInfo.rt);
+
+      return res.status(200).json({
+        id: `chatcmpl-${Date.now()}`,
+        object: "chat.completion",
+        created: Math.floor(Date.now() / 1000),
+        model: req.body.model || "gpt-4o",
+        choices: [{
+          index: 0,
+          message: {
+            role: "assistant",
+            content: `Token刷新成功！Access token前20个字符: ${accessToken.substring(0, 20)}...`
+          },
+          finish_reason: "stop",
+        }],
+        usage: { prompt_tokens: 10, completion_tokens: 15, total_tokens: 25 },
+      });
+
+    } catch (error) {
+      return res.status(402).json({
+        error: "Token刷新失败",
+        details: error.message,
+        user_info: {
+          user_id: userInfo.user_id,
+          email: userInfo.email,
+          client_uuid: userInfo.client_uuid
+        }
+      });
+    }
 
   } catch (error) {
     return res.status(500).json({
