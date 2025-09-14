@@ -1,0 +1,6 @@
+name = "highlight2api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Cloudflare Workers 部署配置
+# 运行: wrangler deploy

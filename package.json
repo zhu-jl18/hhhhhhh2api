@@ -1,0 +1,27 @@
+{
+  "name": "highlight2api-vercel",
+  "version": "1.0.0",
+  "description": "Highlight AI API 代理服务 - Vercel Edge Functions 版本",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build",
+    "deploy": "vercel --prod",
+    "preview": "vercel"
+  },
+  "keywords": [
+    "highlight-ai",
+    "openai-api",
+    "vercel",
+    "edge-functions",
+    "ai-proxy"
+  ],
+  "author": "三文鱼",
+  "license": "MIT",
+  "devDependencies": {
+    "@vercel/node": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
