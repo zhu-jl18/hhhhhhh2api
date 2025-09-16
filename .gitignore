@@ -38,7 +38,9 @@ build/
 .vercel
 
 # Sensitive files (API keys and tokens)
-.claude
-.qoder
-cloudflare
+.claude*
+.qoder*
+cloudflare*
 *.txt
+*.key
+*.pem
