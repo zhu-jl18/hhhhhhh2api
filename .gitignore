@@ -36,3 +36,9 @@ build/
 *.tmp
 *.temp
 .vercel
+
+# Sensitive files (API keys and tokens)
+.claude
+.qoder
+cloudflare
+*.txt
