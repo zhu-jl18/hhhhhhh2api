@@ -1,5 +1,13 @@
 # Highlight 2 API
 
+## 项目来源
+
+项目来源：https://linux.do/t/topic/859589
+
+原代码为 Deno 版本，本仓库额外添加提供 Vercel 版本部署支持。
+
+## 简介
+
 将 Highlight AI 接口转换为 OpenAI 兼容格式的代理服务。
 
 ## 手动部署
@@ -24,10 +32,6 @@
 
 - `/api/v1/models` - 模型列表
 - `/api/v1/chat/completions` - 聊天接口
-
-## 来源
-
-项目来源：https://linux.do/t/topic/859589
 
 ## 免责声明
 
